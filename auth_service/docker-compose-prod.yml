@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: packaging/docker/AuthService/Dockerfile
+    command: >
+      sh -c "echo 'Running in production environment!' &&
+             python -m main"
+    volumes:
+      - ./src/AuthService:/AuthService
+    env_file:
+      - .env
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    restart: on-failure
+
+  postgres_db:
+    image: postgres:13.0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
+      timeout: 10s
+      interval: 1s
+      retries: 20
+
+  nginx:
+    image: nginx:latest
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    volumes:
+      - ./packaging/conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./packaging/conf/nginx/self-signed.conf:/etc/nginx/snippets/self-signed.conf
+      - ./packaging/conf/nginx/ssl-params.conf:/etc/nginx/snippets/ssl-params.conf
+      - ./packaging/data/certbot/conf:/etc/letsencrypt
+      - ./packaging/data/certbot/www:/var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - web
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./packaging/data/certbot/conf:/etc/letsencrypt
+      - ./packaging/data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  postgres_data:
