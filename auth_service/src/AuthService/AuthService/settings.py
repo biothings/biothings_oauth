@@ -15,3 +15,5 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 # SQLAlchemy settings
 SQLALCHEMY_DB_URL = f"{DB_ENGINE}://{DB_USER}:{DB_PASSWORD}@" \
                     f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+AUTH_SERVICE_DOMAIN = os.environ.get("AUTH_SERVICE_DOMAIN")
