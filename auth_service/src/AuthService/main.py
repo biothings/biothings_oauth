@@ -2,8 +2,8 @@ import tornado.ioloop
 from tornado.web import url, RequestHandler, Application
 from tornado.httpserver import HTTPServer
 
-from AuthService import settings, database
-from demo import models
+from AuthService import settings, database, views as auth_views
+from demo import models, views as demo_views
 
 
 class MainHandler(RequestHandler):
@@ -28,6 +28,10 @@ def make_app():
 
     urls = [
         url(r"/", MainHandler, {"db": db}, name="main_handler"),
+        url(r"/oauth/token", auth_views.AuthHandler, name="oauth_token_issuer"),
+        url(r"/.well-known/public-key", auth_views.PublicKeyHandler, name="public_key"),
+        url(r"/auth-demo", demo_views.ExampleAuthRequiredHandler, name="auth_demo"),
+        url(r"/scopes-demo", demo_views.ExampleScopeRequiredHandler, name="scopes_demo"),
     ]
 
     return Application(handlers=urls, debug=settings.DEBUG)
