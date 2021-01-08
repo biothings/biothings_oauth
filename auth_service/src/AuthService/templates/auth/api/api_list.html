@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>APIs Management</title>
+        <style>
+            table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+            }
+
+            td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+
+            tr:nth-child(even) {
+              background-color: #dddddd;
+            }
+        </style>
+    </head>
+
+   <body>
+   {% if apis %}
+   <h2>APIs list:</h2>
+   <table>
+      <tr>
+        <td>Name</td>
+        <td>Identifier</td>
+        <td>Description</td>
+        <td>Created At</td>
+        <td>Updated At</td>
+        <td>Edit</td>
+        <td>Delete</td>
+      </tr>
+        {% for api in apis %}
+        <tr>
+            <td>{{ api.name }}</td>
+            <td>{{ api.identifier }}</td>
+            <td>{{ api.description }}</td>
+            <td>{{ api.created_at }}</td>
+            <td>{{ api.updated_at }}</td>
+            <td><a href="{{ reverse_url('api_edit', api.id) }}">Edit</a></td>
+            <td>
+                <form action="{{ reverse_url('api_deletion', api.id) }}" method="post">
+                    <input type="submit" value="Delete"/>
+                    {% module xsrf_form_html() %}
+                </form>
+            </td>
+        </tr>
+        {% end %}
+    </table>
+   {% else %}
+   <h2>No APIs were added. Please add some APIs first!</h2>
+   {% end %}
+    <div>
+      <a href="{{ reverse_url('api_addition') }}">Add new API</a>
+      <p><strong>Note: </strong> All times are in UTC timezone.</p>
+    </div>
+   </body>
+</html>

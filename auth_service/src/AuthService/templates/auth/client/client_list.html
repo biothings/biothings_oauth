@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>Clients Management</title>
+        <style>
+            table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+            }
+
+            td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+
+            tr:nth-child(even) {
+              background-color: #dddddd;
+            }
+        </style>
+    </head>
+
+   <body>
+   {% if clients %}
+   <h2>Clients list:</h2>
+   <table>
+      <tr>
+        <td>Name</td>
+        <td>Type</td>
+        <td>Authorized</td>
+        <td>Created At</td>
+        <td>Updated At</td>
+        <td>Edit</td>
+        <td>Delete</td>
+      </tr>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.name }}</td>
+            <td>{{ client.type.value }}</td>
+            <td>{{ client.authorized }}</td>
+            <td>{{ client.created_at }}</td>
+            <td>{{ client.updated_at }}</td>
+            <td><a href="{{ reverse_url('client_edit', client.id) }}">Edit</a></td>
+            <td>
+                <form action="{{ reverse_url('client_deletion', client.id) }}" method="post">
+                    <input type="submit" value="Delete"/>
+                    {% module xsrf_form_html() %}
+                </form>
+            </td>
+        </tr>
+        {% end %}
+    </table>
+   {% else %}
+   <h2>No clients were added. Please add some clients first!</h2>
+   {% end %}
+    <div>
+      <a href="{{ reverse_url('client_addition') }}">Add new client</a>
+      <p><strong>Note: </strong> All times are in UTC timezone.</p>
+    </div>
+   </body>
+</html>
