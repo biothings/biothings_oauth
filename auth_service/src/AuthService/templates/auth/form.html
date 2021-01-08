@@ -1,0 +1,20 @@
+<form action="{{ request.path }}" method="post">
+     {% if result %}
+     <h2>{{ result }}</h2>
+     {% end %}
+
+     {% for field in form %}
+         {% raw field.label() %}
+         {% raw field() %}
+         {% if field.errors %}
+            <ul class="errors">
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% end %}
+            </ul>
+         {% end %}
+     {% end %}
+
+   <div><input type="submit" value="{{ action }}"/></div>
+   {% module xsrf_form_html() %}
+ </form>

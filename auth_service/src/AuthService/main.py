@@ -1,25 +1,14 @@
 import tornado.ioloop
-from tornado.web import url, RequestHandler, Application
+from tornado.web import url, Application
 from tornado.httpserver import HTTPServer
 
-from AuthService import settings, database, views as auth_views
-from demo import models, views as demo_views
-
-
-class MainHandler(RequestHandler):
-    def initialize(self, db):
-        self.db = db
-
-    def get(self):
-        user = models.User(
-                name="Test", fullname="Test User", nickname="test"
-            )
-        self.db.add(user)
-        self.db.commit()
-
-        self.write(
-            {"result": f"Created a new user {user}"}
-        )
+from AuthService import settings, database
+from auth.handlers import (
+    # API handlers
+    ApiAddition, ApiList, ApiDeletion, ApiEdit,
+    # Client handlers
+    ClientAddition, ClientList, ClientDeletion, ClientEdit
+)
 
 
 def make_app():
@@ -27,14 +16,49 @@ def make_app():
     database.Base.metadata.create_all(bind=database.engine)
 
     urls = [
-        url(r"/", MainHandler, {"db": db}, name="main_handler"),
-        url(r"/oauth/token", auth_views.AuthHandler, name="oauth_token_issuer"),
-        url(r"/.well-known/public-key", auth_views.PublicKeyHandler, name="public_key"),
-        url(r"/auth-demo", demo_views.ExampleAuthRequiredHandler, name="auth_demo"),
-        url(r"/scopes-demo", demo_views.ExampleScopeRequiredHandler, name="scopes_demo"),
+        # API handlers
+        url("/apis/", ApiList, {"db": db}, name="api_list"),
+        url("/apis/add", ApiAddition, {"db": db}, name="api_addition"),
+        url(
+            r"/apis/(?P<pk>[0-9]+)/delete",
+            ApiDeletion,
+            {"db": db},
+            name="api_deletion"
+        ),
+        url(
+            r"/apis/(?P<pk>[0-9]+)/edit",
+            ApiEdit,
+            {"db": db},
+            name="api_edit"
+        ),
+        # Client handlers
+        url("/clients/", ClientList, {"db": db}, name="client_list"),
+        url(
+            "/clients/add",
+            ClientAddition,
+            {"db": db},
+            name="client_addition"
+        ),
+        url(
+            r"/clients/(?P<pk>[0-9]+)/delete",
+            ClientDeletion,
+            {"db": db},
+            name="client_deletion"
+        ),
+        url(
+            r"/clients/(?P<pk>[0-9]+)/edit",
+            ClientEdit,
+            {"db": db},
+            name="client_edit"
+        ),
     ]
 
-    return Application(handlers=urls, debug=settings.DEBUG)
+    return Application(
+        template_path="templates",
+        handlers=urls,
+        debug=settings.DEBUG,
+        xsrf_cookies=settings.XSRF_COOKIES
+    )
 
 
 def main():
