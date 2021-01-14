@@ -1,4 +1,4 @@
-version: '2.7'
+version: '2.4'
 
 services:
   web:
@@ -15,7 +15,8 @@ services:
     ports:
       - 8888:8888
     depends_on:
-      - postgres_db
+      postgres_db:
+        condition: service_healthy
     restart: on-failure
 
   postgres_db:

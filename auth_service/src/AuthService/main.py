@@ -3,10 +3,10 @@ from tornado.web import url, Application
 from tornado.httpserver import HTTPServer
 
 from AuthService import settings, database
-from auth.handlers import (
-    # API handlers
-    ApiAddition, ApiList, ApiDeletion, ApiEdit,
-    # Client handlers
+from demo import views as demo_views
+from auth.handlers import auth as auth_views
+from auth.handlers.api import ApiAddition, ApiList, ApiDeletion, ApiEdit
+from auth.handlers.client import (
     ClientAddition, ClientList, ClientDeletion, ClientEdit
 )
 
@@ -50,6 +50,28 @@ def make_app():
             ClientEdit,
             {"db": db},
             name="client_edit"
+        ),
+        # Authentication handlers
+        url(
+            r"/oauth/token",
+            auth_views.OAuthTokenIssuing,
+            {"db": db},
+            name="oauth_token_issuing"
+        ),
+        url(
+            r"/.well-known/public-key",
+            auth_views.PublicKeyHandler,
+            name="public_key"
+        ),
+        url(
+            r"/auth-demo",
+            demo_views.ExampleAuthRequiredHandler,
+            name="auth_demo"
+        ),
+        url(
+            r"/scopes-demo",
+            demo_views.ExampleScopeRequiredHandler,
+            name="scopes_demo"
         ),
     ]
 

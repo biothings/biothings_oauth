@@ -19,7 +19,6 @@ class BaseModel:
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, onupdate=datetime.datetime.utcnow)
-    deleted_at = Column(DateTime)
 
 
 class User(Base):
