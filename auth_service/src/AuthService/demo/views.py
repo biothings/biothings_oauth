@@ -1,11 +1,8 @@
-import json
-from functools import wraps
-
 from tornado.httpclient import AsyncHTTPClient
 from tornado.web import RequestHandler
 from jose import jwt
 from AuthService import settings
-import requests
+
 
 AUTH_SERVICE_DOMAIN = settings.AUTH_SERVICE_DOMAIN
 API_AUDIENCE = 'test' #YOUR_API_AUDIENCE
