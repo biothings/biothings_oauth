@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from sqlalchemy.sql.expression import true
 from tornado.web import RequestHandler
@@ -20,6 +21,24 @@ class PublicKeyHandler(RequestHandler):
 
 
 class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
+
+    @staticmethod
+    def _get_exp_timestamp():
+        """
+        Returns the exp claim value in UTC timestamp.
+
+        Returns:
+             (int): Timestamp in UTC.
+        """
+
+        return int(
+            (
+                    datetime.datetime.utcnow() +
+                    datetime.timedelta(minutes=settings.JWT_EXP_IN_MINUTES)
+            )
+            .replace(tzinfo=datetime.timezone.utc)
+            .timestamp()
+        )
 
     def _get_valid_client_secret(self, client_id):
         client = self.db\
@@ -50,12 +69,12 @@ class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
         return ' '.join(authorized_scopes_names)
 
     def _return_jwt(self, client_id):
-        scopes = self._get_client_authorized_scopes(client_id)
         header = {'alg': 'RS256', 'typ': 'JWT'}
         payload = {
             'iss': f"https://{settings.AUTH_SERVICE_DOMAIN}/",
-            'sub': '123',
-            'scope': scopes
+            'sub': client_id,
+            'exp': self._get_exp_timestamp(),
+            'scope': self._get_client_authorized_scopes(client_id)
         }
         key = load_pem_private_key(
             settings.PRIVATE_KEY.encode("UTF-8"),
@@ -67,7 +86,6 @@ class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
         self.write({
             'access_token': access_token.decode('ascii'),
             'token_type': 'Bearer',
-            'expires_in': 'TODO'
         })
 
     def post(self):
