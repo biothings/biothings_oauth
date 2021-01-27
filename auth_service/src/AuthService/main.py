@@ -79,7 +79,8 @@ def make_app():
         template_path="templates",
         handlers=urls,
         debug=settings.DEBUG,
-        xsrf_cookies=settings.XSRF_COOKIES
+        xsrf_cookies=settings.XSRF_COOKIES,
+        static_path=settings.STATIC_DIR
     )
 
 
