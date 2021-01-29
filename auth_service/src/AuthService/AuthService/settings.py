@@ -4,6 +4,7 @@ import os
 # Tornado settings
 DEBUG = int(os.environ.get("DEBUG", default=0))
 XSRF_COOKIES = True
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 # Database connection settings
 DB_ENGINE = os.environ.get("DB_ENGINE")
