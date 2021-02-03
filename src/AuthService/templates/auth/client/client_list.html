@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wu Lab | Clients Management</title>
+
+  <!-- GOOGLE FONT LATO -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+</head>
+
+<body>
+
+  <div class="l-wrapper">
+    <section class="u-py-48 u-bg-light-gray">
+      <div class="l-container u-text-center">
+
+        {% if clients %}
+        <h1 class="u-mb-32 u-text-uppercase">Clients list:</h1>
+
+        <div class="c-table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Authorized</th>
+                <th>Client ID</th>
+                <th>Client Secret</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for client in clients %}
+              <tr>
+                <td>
+                  <a href="{{ reverse_url('client_detail', client.id) }}">
+                    {{ client.name }}
+                  </a>
+                </td>
+                <td style="min-width: 150px;">{{ client.type.value }}</td>
+                <td>
+                  {% if client.authorized %}
+                  <span style="font-style: italic; font-weight: bolder; color: green;">
+                      Yes
+                  </span>
+                  {% else %}
+                  <span style="font-style: italic; font-weight: bolder; color: red;">
+                      No
+                  </span>
+                  {% end %}
+                </td>
+                <td>{{ client.client_id }}</td>
+                <td>{{ client.client_secret }}</td>
+                <td>{{ client.created_at }}</td>
+                <td>{{ client.updated_at }}</td>
+                <td><a href="{{ reverse_url('client_edit', client.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
+                <td>
+                  <form action="{{ reverse_url('client_deletion', client.id) }}" method="post">
+                    <button type="submit" class="c-button c-button--sm c-button--outline">Delete</button>
+                    {% module xsrf_form_html() %}
+                  </form>
+                </td>
+              </tr>
+              {% end %}
+            </tbody>
+          </table>
+        </div>
+
+        {% else %}
+        <p class="c-lead">No clients were added. Please add some clients first!</p>
+        {% end %}
+        <div class="u-mt-32">
+          <a href="{{ reverse_url('client_addition') }}" class="c-button c-button--big">Add new client</a>
+          <p class="u-text-gray u-mt-16"><strong>Note: </strong> All times are in UTC timezone.</p>
+        </div>
+
+      </div><!-- /.l-container -->
+    </section>
+  </div>
+
+</body>
+
+</html>

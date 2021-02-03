@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wu Lab | Add API</title>
+
+  <!-- GOOGLE FONT LATO -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+</head>
+
+<body>
+
+  <div class="l-wrapper">
+    <section class="u-py-48 u-bg-gray">
+      <div class="l-container u-text-center">
+
+        <h1 class="u-mb-32 u-text-uppercase">Add API</h1>
+
+        <div>
+          {%
+            module Template(
+              "auth/form.html", result=result, form=form, action="Add API"
+            )
+          %}
+        </div>
+
+      </div><!-- /.l-container -->
+    </section>
+  </div>
+</body>
+
+</html>

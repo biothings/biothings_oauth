@@ -1,0 +1,31 @@
+<form action="{{ request.path }}" method="post" class="c-form">
+  {% if result %}
+  <p class="c-lead u-mb-32">{{ result }}</p>
+  {% end %}
+
+  {% for field in form %}
+  
+    <div class="c-form__group u-text-left">
+      <div class="c-form__label-container">
+        {% raw field.label() %}
+      </div>
+      <div class="c-form__input-container">
+        {% raw field() %}
+      </div>
+    </div>
+
+    {% if field.errors %}
+    <ul class="errors">
+      {% for error in field.errors %}
+      <li>{{ error }}</li>
+      {% end %}
+    </ul>
+    {% end %}
+
+  {% end %}
+
+  <div class="u-mt-32">
+    <button type="submit" class="c-button c-button--lg">{{ action }}</button>
+  </div>
+  {% module xsrf_form_html() %}
+</form>
