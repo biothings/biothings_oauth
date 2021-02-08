@@ -4,11 +4,16 @@ from tornado.httpserver import HTTPServer
 
 from AuthService import settings, database
 from demo import views as demo_views
+from core.handlers import Home
 from auth.handlers import auth as auth_views
-from auth.handlers.api import ApiAddition, ApiList, ApiDeletion, ApiEdit
-from auth.handlers.client import (
-    ClientAddition, ClientList, ClientDeletion, ClientEdit
+from auth.handlers.scope import ScopeAddition, ScopeDeletion, ScopeEdit
+from auth.handlers.api import (
+    ApiAddition, ApiList, ApiDeletion, ApiEdit, ApiDetail
 )
+from auth.handlers.client import (
+    ClientAddition, ClientList, ClientDeletion, ClientEdit, ClientDetail
+)
+from auth.handlers.user import UserDetail
 
 
 def make_app():
@@ -16,7 +21,13 @@ def make_app():
     database.Base.metadata.create_all(bind=database.engine)
 
     urls = [
-        # API handlers
+        # region core app
+        url("/", Home, {"db": db}, name="home"),
+        # endregion
+
+        # region auth app
+
+        # region API handlers
         url("/apis/", ApiList, {"db": db}, name="api_list"),
         url("/apis/add", ApiAddition, {"db": db}, name="api_addition"),
         url(
@@ -26,12 +37,39 @@ def make_app():
             name="api_deletion"
         ),
         url(
+            r"/apis/(?P<pk>[0-9]+)",
+            ApiDetail,
+            {"db": db},
+            name="api_detail"
+        ),
+        url(
             r"/apis/(?P<pk>[0-9]+)/edit",
             ApiEdit,
             {"db": db},
             name="api_edit"
         ),
-        # Client handlers
+        # endregion
+        # region Scope handlers
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/add",
+            ScopeAddition,
+            {"db": db},
+            name="scope_addition"
+        ),
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/(?P<pk>[0-9]+)/edit",
+            ScopeEdit,
+            {"db": db},
+            name="scope_edit"
+        ),
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/(?P<pk>[0-9]+)/delete",
+            ScopeDeletion,
+            {"db": db},
+            name="scope_deletion"
+        ),
+        # endregion
+        # region Client handlers
         url("/clients/", ClientList, {"db": db}, name="client_list"),
         url(
             "/clients/add",
@@ -51,7 +89,20 @@ def make_app():
             {"db": db},
             name="client_edit"
         ),
-        # Authentication handlers
+        url(
+            r"/clients/(?P<pk>[0-9]+)",
+            ClientDetail,
+            {"db": db},
+            name="client_detail"
+        ),
+        # endregion
+        # region Authentication handlers
+        url(
+            r"/oauth/github_auth",
+            auth_views.GitHubAuth,
+            {"db": db},
+            name="github_auth"
+        ),
         url(
             r"/oauth/token",
             auth_views.OAuthTokenIssuing,
@@ -73,6 +124,18 @@ def make_app():
             demo_views.ExampleScopeRequiredHandler,
             name="scopes_demo"
         ),
+        # endregion
+        # region Users
+        url(settings.LOGIN_URL, auth_views.Login, {"db": db}, name="login"),
+        url(
+            r"/user/(?P<pk>[0-9]+)",
+            UserDetail,
+            {"db": db},
+            name="user_detail"
+        ),
+        # endregion
+
+        # endregion
     ]
 
     return Application(
@@ -80,7 +143,9 @@ def make_app():
         handlers=urls,
         debug=settings.DEBUG,
         xsrf_cookies=settings.XSRF_COOKIES,
-        static_path=settings.STATIC_DIR
+        static_path=settings.STATIC_DIR,
+        cookie_secret=settings.COOKIE_SECRET,
+        login_url=settings.LOGIN_URL
     )
 
 

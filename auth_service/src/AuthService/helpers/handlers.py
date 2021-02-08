@@ -11,7 +11,7 @@ class HandlersHelper:
 
     @classmethod
     def build_request_form(
-            cls, request: httputil.HTTPServerRequest, form_class
+            cls, request: httputil.HTTPServerRequest, form_class, **form_kwargs
     ):
         """
         Builds a form instance with the data in request body.
@@ -20,7 +20,8 @@ class HandlersHelper:
             request (tornado.httputil.HTTPServerRequest: The request to build
             form from.
             form_class (class): The class to be instantiated.
-
+            form_kwargs (dict): Keyword arguments to send to form class while
+                instantiation.
         Returns:
             form (form_class): An instance of form_class with the body data
             in the request.
@@ -28,4 +29,4 @@ class HandlersHelper:
 
         request_form_data = RequestsHelper.get_decoded_body_arguments(request)
 
-        return form_class(MultiDict(request_form_data))
+        return form_class(formdata=MultiDict(request_form_data), **form_kwargs)

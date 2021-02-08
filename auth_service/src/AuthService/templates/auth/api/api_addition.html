@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add API</title>
+  <title>The Wu Lab | Add API</title>
 
   <!-- GOOGLE FONT LATO -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -15,15 +15,18 @@
 <body>
 
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-gray">
+    <section class="u-py-48 u-bg-gray l-viewport-center">
       <div class="l-container u-text-center">
 
-        <h1 class="u-mb-32 u-text-uppercase">Add API</h1>
+        <div class="u-mb-32">
+          <h1 class="u-text-uppercase">Add API</h1>
+          <p>or go back to <a href="{{ reverse_url('api_list') }}">APIs list</a></p>
+        </div>
 
         <div>
           {%
             module Template(
-              "auth/form.html", result=result, form=form, action="Add"
+              "auth/form.html", result=result, form=form, action="Add API"
             )
           %}
         </div>

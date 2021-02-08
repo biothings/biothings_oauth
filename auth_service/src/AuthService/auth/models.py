@@ -6,7 +6,7 @@ from sqlalchemy import (
     # Column Types
     Integer, String, DateTime, ForeignKey, Boolean,
     # Other
-    Column, Enum
+    Column, Enum, UniqueConstraint
 )
 
 from AuthService.database import Base
@@ -21,6 +21,14 @@ class BaseModel:
     updated_at = Column(DateTime, onupdate=datetime.datetime.utcnow)
 
 
+class UserIdentityProvider(enum.Enum):
+    """
+    Represents supported identity providers.
+    """
+    GITHUB = "GITHUB"
+    ORCID = "ORCID"
+
+
 class User(Base):
     """
     Represents a user to be authenticated.
@@ -28,11 +36,24 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
     username = Column(String(64))
-    identity_provider = Column(String(255))
+    identity_provider = Column(Enum(UserIdentityProvider))
     identity_provider_user_id = Column(Integer)
+    last_identity_provider_authentication = Column(DateTime)
 
     clients = relationship("Client", back_populates="user")
+
+    __table_args__ = (
+        UniqueConstraint(
+            username, identity_provider, name="identity_provider_username"
+        ),
+        UniqueConstraint(
+            username,
+            identity_provider_user_id,
+            name="identity_provider_user_id"
+        ),
+    )
 
     def __str__(self):
         return self.username
@@ -48,8 +69,12 @@ class Api(Base, BaseModel):
     identifier = Column(String(256), unique=True, nullable=False)
     description = Column(String(512))
 
-    scopes = relationship("Scope", back_populates="api", cascade="all, delete")
-    clients = relationship("ClientApi", back_populates="api")
+    scopes = relationship(
+        "Scope", back_populates="api", cascade="all, delete-orphan"
+    )
+    clients = relationship(
+        "ClientApi", back_populates="api", cascade="all, delete-orphan"
+    )
 
     def __str__(self):
         return f"'{self.name}' - ({self.identifier})"
@@ -66,7 +91,13 @@ class Scope(Base, BaseModel):
     api_id = Column(Integer, ForeignKey(Api.id))
 
     api = relationship(Api, back_populates="scopes")
-    client_apis = relationship("ClientApiScope", back_populates="scope")
+    client_apis = relationship(
+        "ClientApiScope", back_populates="scope", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        UniqueConstraint(api_id, name, name="api_id_scope_name"),
+    )
 
     def __str__(self):
         return self.name
@@ -97,7 +128,7 @@ class Client(Base, BaseModel):
 
     user = relationship(User, back_populates="clients")
     apis = relationship(
-        "ClientApi", back_populates="client", cascade="all, delete"
+        "ClientApi", back_populates="client", cascade="all,delete-orphan"
     )
 
     def __str__(self):
@@ -114,7 +145,11 @@ class ClientApi(Base):
     client_id = Column(Integer, ForeignKey(Client.id))
     api_id = Column(Integer, ForeignKey(Api.id))
 
-    scopes = relationship("ClientApiScope", back_populates="client_api")
+    scopes = relationship(
+        "ClientApiScope",
+        back_populates="client_api",
+        cascade="all, delete-orphan"
+    )
     client = relationship(Client, back_populates="apis")
     api = relationship(Api, back_populates="clients")
 

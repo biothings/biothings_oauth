@@ -4,6 +4,8 @@ import os
 # Tornado settings
 DEBUG = int(os.environ.get("DEBUG", default=0))
 XSRF_COOKIES = True
+COOKIE_SECRET = os.environ.get("COOKIE_SECRET")
+LOGIN_URL = "/login"
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 # Database connection settings
@@ -21,4 +23,4 @@ SQLALCHEMY_DB_URL = f"{DB_ENGINE}://{DB_USER}:{DB_PASSWORD}@" \
 AUTH_SERVICE_DOMAIN = os.environ.get("AUTH_SERVICE_DOMAIN")
 PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
 PUBLIC_KEY = os.environ.get("PUBLIC_KEY")
-JWT_EXP_IN_MINUTES = os.environ.get("JWT_EXP_IN_MINUTES")
+JWT_EXP_IN_MINUTES = int(os.environ.get("JWT_EXP_IN_MINUTES"))

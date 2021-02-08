@@ -1,10 +1,12 @@
 import uuid
 import secrets
 
+from sqlalchemy.orm import subqueryload
+import tornado
 from tornado.web import RequestHandler
 
 from auth import APP_NAME
-from auth.models import Client
+from auth.models import Client, ClientApi
 from auth.forms import ClientForm
 from helpers.handlers import HandlersHelper
 from bases.handlers import BaseHandler
@@ -16,6 +18,7 @@ class ClientAddition(BaseHandler, RequestHandler):
     Client instance.
     """
 
+    @tornado.web.authenticated
     def get(self):
         """
         Handles rendering Client addition form.
@@ -23,15 +26,18 @@ class ClientAddition(BaseHandler, RequestHandler):
         self.render(
             f"{APP_NAME}/client/client_addition.html",
             result=None,
-            form=ClientForm()
+            form=ClientForm(db=self.db)
         )
 
+    @tornado.web.authenticated
     def post(self):
         """
         Handles saving a new instance to Client model.
         """
 
-        form = HandlersHelper.build_request_form(self.request, ClientForm)
+        form = HandlersHelper.build_request_form(
+            self.request, ClientForm, db=self.db
+        )
 
         if not form.validate():
             self.set_status(400)
@@ -43,7 +49,8 @@ class ClientAddition(BaseHandler, RequestHandler):
             )
             return
 
-        client = Client(**form.data)
+        client = Client()
+        form.populate_obj(client)
         client.client_id = uuid.uuid4()
         client.client_secret = secrets.token_urlsafe()[:25]
 
@@ -54,7 +61,7 @@ class ClientAddition(BaseHandler, RequestHandler):
         self.render(
             f"{APP_NAME}/client/client_addition.html",
             result="Client was saved successfully!",
-            form=ClientForm()
+            form=ClientForm(db=self.db)
         )
 
 
@@ -63,6 +70,7 @@ class ClientList(BaseHandler, RequestHandler):
     Handles listing/deleting/and redirecting to editing Client instances.
     """
 
+    @tornado.web.authenticated
     def get(self):
         """
         Handles listing all existing Client instances ascending sorted by
@@ -80,11 +88,45 @@ class ClientList(BaseHandler, RequestHandler):
         )
 
 
+class ClientDetail(BaseHandler, RequestHandler):
+    """
+    Handles displaying a Client instance's details.
+    """
+
+    @tornado.web.authenticated
+    def get(self, pk):
+        """
+        Handles rendering a Client instance's details web page.
+
+        Arguments:
+            pk (int): Primary key (ID) of the Client instance.
+        """
+
+        client = self.db \
+            .query(Client) \
+            .options(
+                subqueryload(Client.apis, ClientApi.api),
+            ) \
+            .filter(Client.id == pk) \
+            .first()
+
+        if not client:
+            self.set_status(404)
+            return
+
+        self.render(
+            f"{APP_NAME}/client/client_detail.html",
+            client=client,
+            result=None
+        )
+
+
 class ClientDeletion(BaseHandler, RequestHandler):
     """
     Handles deleting a Client instance.
     """
 
+    @tornado.web.authenticated
     def post(self, pk):
         """
         Delete a Client instance using its pk.
@@ -112,6 +154,7 @@ class ClientEdit(BaseHandler, RequestHandler):
     Handles editing a Client instance.
     """
 
+    @tornado.web.authenticated
     def get(self, pk):
         """
         Handles rendering Client editing form.
@@ -122,6 +165,7 @@ class ClientEdit(BaseHandler, RequestHandler):
 
         client = self.db\
             .query(Client)\
+            .options(subqueryload(Client.apis, ClientApi.api)) \
             .filter(Client.id == pk)\
             .first()
 
@@ -132,9 +176,10 @@ class ClientEdit(BaseHandler, RequestHandler):
         self.render(
             f"{APP_NAME}/client/client_edit.html",
             result=None,
-            form=ClientForm(obj=client)
+            form=ClientForm(db=self.db, obj=client)
         )
 
+    @tornado.web.authenticated
     def post(self, pk):
         """
         Edits an existing Client instance.
@@ -148,7 +193,9 @@ class ClientEdit(BaseHandler, RequestHandler):
             self.set_status(404)
             return
 
-        form = HandlersHelper.build_request_form(self.request, ClientForm)
+        form = HandlersHelper.build_request_form(
+            self.request, ClientForm, db=self.db
+        )
 
         if not form.validate():
             self.set_status(400)

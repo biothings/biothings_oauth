@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clients Management</title>
+  <title>The Wu Lab | Clients Management</title>
 
   <!-- GOOGLE FONT LATO -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -15,7 +15,7 @@
 <body>
 
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-light-gray">
+    <section class="u-py-48 u-bg-light-gray l-viewport-center">
       <div class="l-container u-text-center">
 
         {% if clients %}
@@ -39,9 +39,23 @@
             <tbody>
               {% for client in clients %}
               <tr>
-                <td>{{ client.name }}</td>
+                <td>
+                  <a href="{{ reverse_url('client_detail', client.id) }}">
+                    {{ client.name }}
+                  </a>
+                </td>
                 <td style="min-width: 150px;">{{ client.type.value }}</td>
-                <td>{{ client.authorized }}</td>
+                <td>
+                  {% if client.authorized %}
+                  <span style="font-style: italic; font-weight: bolder; color: var(--accent-color-1);">
+                    Yes
+                  </span>
+                  {% else %}
+                  <span style="font-style: italic; font-weight: bolder; color: red;">
+                    No
+                  </span>
+                  {% end %}
+                </td>
                 <td>{{ client.client_id }}</td>
                 <td>{{ client.client_secret }}</td>
                 <td>{{ client.created_at }}</td>

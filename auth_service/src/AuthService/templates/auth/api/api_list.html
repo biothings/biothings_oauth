@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APIs Management</title>
+  <title>The Wu Lab | APIs Management</title>
 
   <!-- GOOGLE FONT LATO -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -14,7 +14,7 @@
 
 <body>
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-light-gray">
+    <section class="u-py-48 u-bg-light-gray l-viewport-center">
       <div class="l-container u-text-center">
 
         {% if apis %}
@@ -37,7 +37,11 @@
 
               {% for api in apis %}
                 <tr>
-                  <td>{{ api.name }}</td>
+                  <td>
+                    <a href="{{ reverse_url('api_detail', api.id) }}">
+                      {{ api.name }}
+                    </a>
+                  </td>
                   <td>{{ api.identifier }}</td>
                   <td>{{ api.description }}</td>
                   <td>{{ api.created_at }}</td>
