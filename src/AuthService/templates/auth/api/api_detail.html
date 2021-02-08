@@ -15,25 +15,44 @@
 <body>
 
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-light-gray">
+    <section class="u-py-48 u-bg-light-gray l-viewport-center">
       <div class="l-container u-text-center">
 
-        <h1 class="u-mb-32 u-text-uppercase">{{ api.name }}</h1>
-        <h3>Name: {{ api.name }}</h3>
-        <h3>Identifier: {{ api.identifier }}</h3>
-        <h3>Description: {{ api.description }}</h3>
-        <button type="button" class="c-button c-button--sm c-button--outline">
-            <a href="{{ reverse_url('api_edit', api.id) }}">Edit</a>
-        </button>
-        <form action="{{ reverse_url('api_deletion', api.id) }}" method="post">
-          <button type="submit" class="c-button c-button--sm c-button--outline">Delete</button>
-          {% module xsrf_form_html() %}
-        </form>
+        <h1 class="u-mb-16 u-text-uppercase u-text-left">{{ api.name }}</h1>
+        <div class="c-table-responsive u-mb-48">
+          <table class="c-dictionary-table">
+            <tbody>
+              <tr>
+                <th>API Name:</th>
+                <td>{{ api.name }}</td>
+              </tr>
+              <tr>
+                <th>API Identifier:</th>
+                <td>{{ api.identifier }}</td>
+              </tr>
+              <tr>
+                <th>API Description:</th>
+                <td>{{ api.description }}</td>
+              </tr>
+              <tr>
+                <th>Edit API:</th>
+                <td><a href="{{ reverse_url('api_edit', api.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
+              </tr>
+              <tr>
+                <th>Delete API:</th>
+                <td>
+                  <form action="{{ reverse_url('api_deletion', api.id) }}" method="post">
+                    <button type="submit" class="c-button c-button--sm c-button--outline">Delete</button>
+                    {% module xsrf_form_html() %}
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        <hr>
-
+        <h3 class="u-mb-16 u-text-uppercase u-text-left">API Clients:</h3>
         {% if api.clients %}
-        <h2>API Clients:</h2>
         <div class="c-table-responsive">
           <table>
             <thead>
@@ -60,12 +79,12 @@
                 <td style="min-width: 150px;">{{ api_client.client.type.value }}</td>
                 <td>
                   {% if api_client.client.authorized %}
-                  <span style="font-style: italic; font-weight: bolder; color: green;">
-                      Yes
+                  <span style="font-style: italic; font-weight: bold; color: var(--accent-color-1);">
+                    Yes
                   </span>
                   {% else %}
-                  <span style="font-style: italic; font-weight: bolder; color: red;">
-                      No
+                  <span style="font-style: italic; font-weight: bold; color: red;">
+                    No
                   </span>
                   {% end %}
                 </td>
@@ -89,7 +108,53 @@
         {% else %}
         <p class="c-lead">No clients were linked. Please link some clients first!</p>
         {% end %}
+
+        <hr>
+
+        <h2>API Allowed Scopes:</h2>
+        {% if api.scopes %}
+        <div class="c-table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for scope in api.scopes %}
+                <tr>
+                <td>
+                  <a href="{{ reverse_url('scope_edit', api.id, scope.id) }}">
+                    {{ scope.name }}
+                  </a>
+                </td>
+                <td>{{ scope.description }}</td>
+                <td>{{ scope.created_at }}</td>
+                <td>{{ scope.updated_at }}</td>
+                <td><a href="{{ reverse_url('scope_edit', api.id, scope.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
+                <td>
+                  <form action="{{ reverse_url('scope_deletion', api.id, scope.id) }}" method="post">
+                    <button type="submit" class="c-button c-button--sm c-button--outline">Delete</button>
+                    {% module xsrf_form_html() %}
+                  </form>
+                </td>
+              </tr>
+              {% end %}
+            </tbody>
+          </table>
+        </div>
+
+        {% else %}
+        <p class="c-lead">No scopes were added. Please add some scopes first!</p>
+        {% end %}
+
         <div class="u-mt-32">
+          <a href="{{ reverse_url('scope_addition', api.id) }}" class="c-button c-button--lg">Add new Scope</a>
           <p class="u-text-gray u-mt-16"><strong>Note: </strong> All times are in UTC timezone.</p>
         </div>
 

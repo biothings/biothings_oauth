@@ -95,6 +95,10 @@ class Scope(Base, BaseModel):
         "ClientApiScope", back_populates="scope", cascade="all, delete-orphan"
     )
 
+    __table_args__ = (
+        UniqueConstraint(api_id, name, name="api_id_scope_name"),
+    )
+
     def __str__(self):
         return self.name
 

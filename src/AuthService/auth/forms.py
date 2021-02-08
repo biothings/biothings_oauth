@@ -83,3 +83,17 @@ class ClientForm(Form):
     )
 
     # user = todo
+
+
+class ScopeForm(Form):
+    """
+    Scope model form.
+    """
+    name = StringField(
+        'Name', [validators.Length(max=256)], render_kw={"maxlength": 256}
+    )
+    description = TextAreaField(
+        'Description',
+        [validators.Length(max=512)],
+        render_kw={"maxlength": 512}
+    )

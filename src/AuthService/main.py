@@ -1,5 +1,4 @@
 import tornado.ioloop
-from auth.handlers.auth import Login
 from tornado.web import url, Application
 from tornado.httpserver import HTTPServer
 
@@ -7,6 +6,7 @@ from AuthService import settings, database
 from demo import views as demo_views
 from core.handlers import Home
 from auth.handlers import auth as auth_views
+from auth.handlers.scope import ScopeAddition, ScopeDeletion, ScopeEdit
 from auth.handlers.api import (
     ApiAddition, ApiList, ApiDeletion, ApiEdit, ApiDetail
 )
@@ -47,6 +47,26 @@ def make_app():
             ApiEdit,
             {"db": db},
             name="api_edit"
+        ),
+        # endregion
+        # region Scope handlers
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/add",
+            ScopeAddition,
+            {"db": db},
+            name="scope_addition"
+        ),
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/(?P<pk>[0-9]+)/edit",
+            ScopeEdit,
+            {"db": db},
+            name="scope_edit"
+        ),
+        url(
+            r"/apis/(?P<api_pk>[0-9]+)/scopes/(?P<pk>[0-9]+)/delete",
+            ScopeDeletion,
+            {"db": db},
+            name="scope_deletion"
         ),
         # endregion
         # region Client handlers
@@ -106,7 +126,7 @@ def make_app():
         ),
         # endregion
         # region Users
-        url(settings.LOGIN_URL, Login, {"db": db}, name="login"),
+        url(settings.LOGIN_URL, auth_views.Login, {"db": db}, name="login"),
         url(
             r"/user/(?P<pk>[0-9]+)",
             UserDetail,

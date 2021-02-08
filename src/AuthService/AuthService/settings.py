@@ -23,4 +23,4 @@ SQLALCHEMY_DB_URL = f"{DB_ENGINE}://{DB_USER}:{DB_PASSWORD}@" \
 AUTH_SERVICE_DOMAIN = os.environ.get("AUTH_SERVICE_DOMAIN")
 PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
 PUBLIC_KEY = os.environ.get("PUBLIC_KEY")
-JWT_EXP_IN_MINUTES = os.environ.get("JWT_EXP_IN_MINUTES")
+JWT_EXP_IN_MINUTES = int(os.environ.get("JWT_EXP_IN_MINUTES"))

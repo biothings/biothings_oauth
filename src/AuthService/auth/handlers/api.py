@@ -107,7 +107,10 @@ class ApiDetail(BaseHandler, RequestHandler):
 
         api = self.db \
             .query(Api) \
-            .options(subqueryload(Api.clients, ClientApi.client)) \
+            .options(
+                subqueryload(Api.clients, ClientApi.client),
+                subqueryload(Api.scopes)
+            ) \
             .filter(Api.id == pk) \
             .first()
 

@@ -6,6 +6,7 @@ import requests
 
 from helpers.memcached import get_memcached_client
 from requests_oauthlib import OAuth2Session
+from sqlalchemy.orm import subqueryload
 from sqlalchemy.sql.expression import true
 from tornado.web import RequestHandler
 from authlib.jose import jwt, JsonWebKey
@@ -14,7 +15,9 @@ from cryptography.hazmat.backends import default_backend
 
 from AuthService import settings
 from bases.handlers import BaseHandler, XsrfExemptedHandler
-from auth.models import Client, ClientApi, Scope, User, UserIdentityProvider
+from auth.models import (
+    Client, ClientApi, Scope, User, UserIdentityProvider, ClientApiScope
+)
 from core import APP_NAME as CORE_APP_NAME
 from auth import APP_NAME
 
@@ -67,12 +70,17 @@ class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
 
         authorized_scopes = list(
             self.db
-                .query(Scope)
+                .query(ClientApiScope)
+                .join(Scope)
                 .filter(Scope.api_id.in_(authorized_client_api_ids))
+                .options(subqueryload(ClientApiScope.scope))
         )
         # Maybe serialize the data that needs to be included in the JWT.
         # Currently, we return only Scope.name.
-        authorized_scopes_names = [scope.name for scope in authorized_scopes]
+        authorized_scopes_names = [
+            client_api_scope.scope.name
+            for client_api_scope in authorized_scopes
+        ]
         return ' '.join(authorized_scopes_names)
 
     def _return_jwt(self, client_id):
@@ -103,6 +111,7 @@ class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
             client_id = request_body['client_id']
             client_secret = request_body['client_secret']
         except KeyError:
+            # TODO: Refine the error message to be more informative.
             self.set_status(
                 400, 'Bad request body (missing required field/s).'
             )

@@ -15,7 +15,7 @@
 <body>
 
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-light-gray">
+    <section class="u-py-48 u-bg-light-gray l-viewport-center">
       <div class="l-container u-text-center">
 
         {% if clients %}
@@ -47,12 +47,12 @@
                 <td style="min-width: 150px;">{{ client.type.value }}</td>
                 <td>
                   {% if client.authorized %}
-                  <span style="font-style: italic; font-weight: bolder; color: green;">
-                      Yes
+                  <span style="font-style: italic; font-weight: bolder; color: var(--accent-color-1);">
+                    Yes
                   </span>
                   {% else %}
                   <span style="font-style: italic; font-weight: bolder; color: red;">
-                      No
+                    No
                   </span>
                   {% end %}
                 </td>
