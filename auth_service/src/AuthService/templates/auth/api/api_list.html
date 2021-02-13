@@ -29,8 +29,10 @@
                 <th>Description</th>
                 <th>Created At</th>
                 <th>Updated At</th>
+                {% if current_user.is_admin %}
                 <th>Edit</th>
                 <th>Delete</th>
+                {% end %}
               </tr>
             </thead>
             <tbody>
@@ -46,6 +48,7 @@
                   <td>{{ api.description }}</td>
                   <td>{{ api.created_at }}</td>
                   <td>{{ api.updated_at }}</td>
+                  {% if current_user.is_admin %}
                   <td><a href="{{ reverse_url('api_edit', api.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
                   <td>
                     <form action="{{ reverse_url('api_deletion', api.id) }}" method="post">
@@ -53,6 +56,7 @@
                       {% module xsrf_form_html() %}
                     </form>
                   </td>
+                  {% end %}
                 </tr>
               {% end %}
 
@@ -65,7 +69,9 @@
         {% end %}
 
         <div class="u-mt-32">
+          {% if current_user.is_admin %}
           <a href="{{ reverse_url('api_addition') }}" class="c-button c-button--lg">Add new API</a>
+          {% end %}
           <p class="u-text-gray u-mt-16"><strong>Note: </strong> All times are in UTC timezone.</p>
         </div>
 

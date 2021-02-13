@@ -29,6 +29,14 @@ class UserIdentityProvider(enum.Enum):
     ORCID = "ORCID"
 
 
+class UserRole(enum.Enum):
+    """
+    Represents user roles.
+    """
+    ADMIN = "ADMIN"
+    REGULAR_USER = "REGULAR_USER"
+
+
 class User(Base):
     """
     Represents a user to be authenticated.
@@ -37,7 +45,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    username = Column(String(64))
+    role = Column(
+        Enum(UserRole), default=UserRole.REGULAR_USER, nullable=False
+    )
+    username = Column(String(64), nullable=False)
     identity_provider = Column(Enum(UserIdentityProvider))
     identity_provider_user_id = Column(Integer)
     last_identity_provider_authentication = Column(DateTime)
@@ -54,6 +65,16 @@ class User(Base):
             name="identity_provider_user_id"
         ),
     )
+
+    @property
+    def is_admin(self):
+        """
+        Whether this user is an admin.
+
+        :return: True if user role is admin, False otherwise.
+        """
+
+        return self.role == UserRole.ADMIN
 
     def __str__(self):
         return self.username

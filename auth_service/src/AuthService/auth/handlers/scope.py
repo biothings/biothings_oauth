@@ -2,10 +2,11 @@ from sqlalchemy import exists
 import tornado
 from tornado.web import RequestHandler
 
+from helpers.decorators import admin_required
 from helpers.handlers import HandlersHelper
 from bases.handlers import BaseHandler
 from auth import APP_NAME
-from auth.models import Scope, Api
+from auth.models import Scope
 from auth.forms import ScopeForm
 
 
@@ -15,7 +16,7 @@ class ScopeAddition(BaseHandler, RequestHandler):
     Scope record.
     """
 
-    @tornado.web.authenticated
+    @admin_required
     def get(self, api_pk):
         """
         Handles rendering Scope addition form.
@@ -26,7 +27,7 @@ class ScopeAddition(BaseHandler, RequestHandler):
             form=ScopeForm()
         )
 
-    @tornado.web.authenticated
+    @admin_required
     def post(self, api_pk):
         """
         Handles saving a new instance to Scope model.
@@ -77,7 +78,7 @@ class ScopeDeletion(BaseHandler, RequestHandler):
     Handles deleting a Scope instance.
     """
 
-    @tornado.web.authenticated
+    @admin_required
     def post(self, api_pk, pk):
         """
         Delete a Scope instance using its pk.
@@ -107,7 +108,7 @@ class ScopeEdit(BaseHandler, RequestHandler):
     Handles editing a Scope instance.
     """
 
-    @tornado.web.authenticated
+    @admin_required
     def get(self, api_pk, pk):
         """
         Handles rendering Scope editing form.
@@ -133,7 +134,7 @@ class ScopeEdit(BaseHandler, RequestHandler):
             form=ScopeForm(obj=scope)
         )
 
-    @tornado.web.authenticated
+    @admin_required
     def post(self, api_pk, pk):
         """
         Edits an existing Scope instance.

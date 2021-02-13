@@ -12,6 +12,18 @@ from helpers.handlers import HandlersHelper
 from bases.handlers import BaseHandler
 
 
+def user_controls_client(user, client):
+    """
+    Checks whether the given user can control the given client instance.
+
+    @param user: The user to check against.
+    @param client: The client to be checked.
+    @return: True if the given user controls the given client, False otherwise.
+    """
+
+    return user.is_admin or user.id == client.user_id
+
+
 class ClientAddition(BaseHandler, RequestHandler):
     """
     Client addition handler for rendering Client addition form and saving new
@@ -77,13 +89,17 @@ class ClientList(BaseHandler, RequestHandler):
         'created_at' field.
         """
 
+        # Return the appropriate clients based on user's role.
+        clients = self.db.query(Client)
+
+        if not self.current_user.is_admin:
+            clients = clients.filter(Client.user_id == self.current_user.id)
+
+        clients = list(clients.order_by(Client.created_at))
+
         self.render(
             f"{APP_NAME}/client/client_list.html",
-            clients=list(
-                self.db
-                    .query(Client)
-                    .order_by(Client.created_at)
-            ),
+            clients=clients,
             result=None
         )
 
@@ -113,6 +129,9 @@ class ClientDetail(BaseHandler, RequestHandler):
         if not client:
             self.set_status(404)
             return
+        if not user_controls_client(self.current_user, client):
+            self.set_status(401)
+            return
 
         self.render(
             f"{APP_NAME}/client/client_detail.html",
@@ -141,6 +160,10 @@ class ClientDeletion(BaseHandler, RequestHandler):
 
         if not client:
             self.set_status(404)
+            return
+
+        if not user_controls_client(self.current_user, client):
+            self.set_status(401)
             return
 
         self.db.delete(client)
@@ -173,6 +196,10 @@ class ClientEdit(BaseHandler, RequestHandler):
             self.set_status(404)
             return
 
+        if not user_controls_client(self.current_user, client):
+            self.set_status(401)
+            return
+
         self.render(
             f"{APP_NAME}/client/client_edit.html",
             result=None,
@@ -191,6 +218,10 @@ class ClientEdit(BaseHandler, RequestHandler):
 
         if not client:
             self.set_status(404)
+            return
+
+        if not user_controls_client(self.current_user, client):
+            self.set_status(401)
             return
 
         form = HandlersHelper.build_request_form(
