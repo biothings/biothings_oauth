@@ -1,3 +1,4 @@
+alembic==1.5.4
 appdirs==1.4.3
 Authlib==0.15.2
 CacheControl==0.12.6
@@ -14,6 +15,7 @@ html5lib==1.0.1
 idna==2.8
 ipaddr==2.2.0
 lockfile==0.12.2
+Mako==1.1.4
 MarkupSafe==1.1.1
 msgpack==0.6.2
 oauthlib==3.1.0
@@ -25,6 +27,8 @@ pyasn1==0.4.8
 pycparser==2.20
 pyparsing==2.4.6
 python-binary-memcached==0.30.1
+python-dateutil==2.8.1
+python-editor==1.0.4
 python-jose==3.2.0
 pytoml==0.1.21
 requests==2.22.0

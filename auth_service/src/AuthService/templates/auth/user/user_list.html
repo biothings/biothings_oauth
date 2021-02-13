@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wu Lab | Users</title>
+
+  <!-- GOOGLE FONT LATO -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+</head>
+
+<body>
+  <div class="l-wrapper">
+    <section class="u-py-48 u-bg-light-gray l-viewport-center">
+      <div class="l-container u-text-center">
+
+        <h1 class="u-mb-32 u-text-uppercase">Users list:</h1>
+
+        <div class="c-table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Identity Provider</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {% for user in users %}
+                <tr>
+                  <td>
+                      <a href="{{ reverse_url("user_detail", user.id )}}">
+                      {{ user.username }}
+                      </a>
+                  </td>
+                  <td>{{ user.identity_provider.value }}</td>
+                  <td>{{ user.created_at }}</td>
+                </tr>
+              {% end %}
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="u-mt-32">
+          <p class="u-text-gray u-mt-16"><strong>Note: </strong> All times are in UTC timezone.</p>
+        </div>
+
+      </div><!-- /.l-container -->
+    </section>
+  </div>
+</body>
+
+</html>

@@ -13,12 +13,11 @@ from auth.handlers.api import (
 from auth.handlers.client import (
     ClientAddition, ClientList, ClientDeletion, ClientEdit, ClientDetail
 )
-from auth.handlers.user import UserDetail
+from auth.handlers.user import UserDetail, UserList
 
 
 def make_app():
     db = database.Session()
-    database.Base.metadata.create_all(bind=database.engine)
 
     urls = [
         # region core app
@@ -128,10 +127,16 @@ def make_app():
         # region Users
         url(settings.LOGIN_URL, auth_views.Login, {"db": db}, name="login"),
         url(
-            r"/user/(?P<pk>[0-9]+)",
+            r"/users/(?P<pk>[0-9]+)",
             UserDetail,
             {"db": db},
             name="user_detail"
+        ),
+        url(
+            r"/users/",
+            UserList,
+            {"db": db},
+            name="user_list"
         ),
         # endregion
 

@@ -5,6 +5,13 @@
 cp packaging/environment/env.dev.example .env
 # Fill in the missing values
 docker-compose -f docker-compose-dev.yml up --build
+# After the containers are up, we need to apply database migrations.
+# Run the next command inside the 'web' service container.
+docker exec -it {CONTAINER-NAME} sh -c "alembic upgrade head"
+# The 'CONTAINER-NAME' is variant upon your machine, but most probably you'll run it as:
+docker exec -it wu-labs-auth-service_web_1 sh -c "alembic upgrade head"
+# To get the correct container name, you can list the running containers:
+docker container ls
 ```
 
 The application will then be accessible at localhost:8888
