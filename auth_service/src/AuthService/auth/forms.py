@@ -1,6 +1,6 @@
 from wtforms import (
     # Field types
-    StringField, TextAreaField, SelectField, SelectMultipleField,
+    StringField, TextAreaField, SelectField, SelectMultipleField, BooleanField,
     # Other
     Form, validators
 )
@@ -81,6 +81,7 @@ class ClientForm(Form):
         choices=[],  # This is dynamically set in form's creation.
         coerce=int
     )
+    authorized = BooleanField(default=True)
 
     # user = todo
 

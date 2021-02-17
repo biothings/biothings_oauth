@@ -84,8 +84,11 @@
                 <th>Description</th>
                 <th>Created At</th>
                 <th>Updated At</th>
+                <th>Allowed Scopes</th>
+                {% if current_user.is_admin %}
                 <th>Edit</th>
                 <th>Delete</th>
+                {% end %}
               </tr>
             </thead>
             <tbody>
@@ -100,6 +103,8 @@
                   <td>{{ client_api.api.description }}</td>
                   <td>{{ client_api.api.created_at }}</td>
                   <td>{{ client_api.api.updated_at }}</td>
+                  <td><a href="{{ reverse_url('clientapi_scopes_edit', client.id, client_api.api.id) }}" class="c-button c-button--sm c-button--outline">Manage Allowed Scopes</a></td>
+                  {% if current_user.is_admin %}
                   <td><a href="{{ reverse_url('api_edit', client_api.api.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
                   <td>
                     <form action="{{ reverse_url('api_deletion', client_api.api.id) }}" method="post">
@@ -107,6 +112,7 @@
                       {% module xsrf_form_html() %}
                     </form>
                   </td>
+                  {% end %}
                 </tr>
               {% end %}
             </tbody>

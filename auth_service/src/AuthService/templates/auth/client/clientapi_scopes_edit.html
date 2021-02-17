@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wu Lab | Edit Allowed Client API Scopes</title>
+
+  <!-- GOOGLE FONT LATO -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+</head>
+
+<body>
+  <div class="l-wrapper">
+    <section class="u-py-48 u-bg-gray l-viewport-center">
+      <div class="l-container u-text-center">
+
+        <h1 class="u-mb-32 u-text-uppercase">Edit Allowed Client API Scopes</h1>
+        <h1 class="u-mb-32 u-text-uppercase">API: {{ api.name }}</h1>
+
+
+        <h2>API Available Scopes:</h2>
+        {% if api_scopes %}
+        <form action="{{ request.path }}" method="post">
+          <div class="c-table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th>Allowed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for api_scope in api_scopes %}
+                  <tr>
+                  <td>{{ api_scope.name }}</td>
+                  <td>{{ api_scope.description }}</td>
+                  <td>{{ api_scope.created_at }}</td>
+                  <td>{{ api_scope.updated_at }}</td>
+                  <td style="text-align: center; vertical-align: center;">
+                    <input
+                            {% if api_scope.is_allowed %}
+                            checked
+                            {% end %}
+                            id="api_scope_{{ api_scope.id }}" name="api_scope_{{ api_scope.id }}" type="checkbox"
+                    >
+                  </td>
+                </tr>
+                {% end %}
+              </tbody>
+            </table>
+          </div>
+          <div class="u-mt-32">
+            <button type="submit" class="c-button c-button--lg">Save</button>
+          </div>
+          {% module xsrf_form_html() %}
+        </form>
+        {% else %}
+        <p class="c-lead">No scopes available!</p>
+        {% end %}
+
+
+      </div><!-- /.l-container -->
+    </section>
+  </div>
+</body>
+
+</html>

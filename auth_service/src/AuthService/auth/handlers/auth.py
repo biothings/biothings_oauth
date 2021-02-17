@@ -4,7 +4,6 @@ import datetime
 import os
 import requests
 
-from helpers.memcached import get_memcached_client
 from requests_oauthlib import OAuth2Session
 from sqlalchemy.orm import subqueryload
 from sqlalchemy.sql.expression import true
@@ -13,6 +12,7 @@ from authlib.jose import jwt, JsonWebKey
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.backends import default_backend
 
+from helpers.memcached import get_memcached_client
 from AuthService import settings
 from bases.handlers import BaseHandler, XsrfExemptedHandler
 from auth.models import (

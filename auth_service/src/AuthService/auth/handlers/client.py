@@ -6,7 +6,7 @@ import tornado
 from tornado.web import RequestHandler
 
 from auth import APP_NAME
-from auth.models import Client, ClientApi
+from auth.models import Client, ClientApi, ClientApiScope, Api
 from auth.forms import ClientForm
 from helpers.handlers import HandlersHelper
 from bases.handlers import BaseHandler
@@ -61,7 +61,7 @@ class ClientAddition(BaseHandler, RequestHandler):
             )
             return
 
-        client = Client()
+        client = Client(user_id=self.current_user.id)
         form.populate_obj(client)
         client.client_id = uuid.uuid4()
         client.client_secret = secrets.token_urlsafe()[:25]
@@ -241,4 +241,93 @@ class ClientEdit(BaseHandler, RequestHandler):
         form.populate_obj(client)
         self.db.commit()
 
-        self.redirect(self.reverse_url("client_list"))
+        self.redirect(self.reverse_url("client_detail", client.id))
+
+
+class ClientApiScopesEdit(BaseHandler, RequestHandler):
+    """
+    Handles ClientApi scopes association.
+    """
+
+    @tornado.web.authenticated
+    def get(self, pk, api_pk):
+        client_api = self.db\
+            .query(ClientApi)\
+            .join(Client)\
+            .filter(Client.id == pk)\
+            .join(Api)\
+            .filter(Api.id == api_pk)\
+            .options(
+                subqueryload(ClientApi.api, Api.scopes)
+            )\
+            .first()
+
+        if not client_api:
+            self.set_status(404)
+            return
+
+        if not user_controls_client(self.current_user, client_api.client):
+            self.set_status(403)
+            return
+
+        api_scopes = client_api.api.scopes
+        client_api_scopes = [
+            client_api_scope.scope
+            for client_api_scope in list(
+                self.db
+                    .query(ClientApiScope)
+                    .filter(ClientApiScope.client_api_id == client_api.id)
+                    .options(
+                        subqueryload(ClientApiScope.scope)
+                    )
+            )
+        ]
+
+        for api_scope in api_scopes:
+            api_scope.is_allowed = (api_scope in client_api_scopes)
+
+        self.render(
+            f"{APP_NAME}/client/clientapi_scopes_edit.html",
+            api=client_api.api,
+            api_scopes=api_scopes,
+            result=None
+        )
+
+    @tornado.web.authenticated
+    def post(self, pk, api_pk):
+        client_api = self.db \
+            .query(ClientApi)\
+            .join(Client)\
+            .filter(Client.id == pk)\
+            .join(Api)\
+            .filter(Api.id == api_pk)\
+            .options(
+                subqueryload(ClientApi.api, Api.scopes)
+            )\
+            .first()
+
+        if not client_api:
+            self.set_status(404)
+            return
+
+        if not user_controls_client(self.current_user, client_api.client):
+            self.set_status(403)
+            return
+
+        client_api.scopes = []
+
+        for api_scope in client_api.api.scopes:
+            is_allowed = self.get_body_argument(
+                f"api_scope_{api_scope.id}", None
+            )
+            if is_allowed and str(is_allowed) == "on":
+                client_api.scopes.append(
+                    ClientApiScope(
+                        client_api_id=client_api.id,
+                        scope_id=api_scope.id
+                    )
+                )
+
+        self.db.commit()
+
+        return self.redirect(self.reverse_url("client_detail", pk))

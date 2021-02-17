@@ -70,6 +70,7 @@
                 <th>Client Secret</th>
                 <th>Created At</th>
                 <th>Updated At</th>
+                <th>Allowed Scopes</th>
                 <th>Edit</th>
                 <th>Delete</th>
               </tr>
@@ -102,6 +103,7 @@
                 {% end %}
                 <td>{{ client.created_at }}</td>
                 <td>{{ client.updated_at }}</td>
+                <td><a href="{{ reverse_url('clientapi_scopes_edit', client.id, api.id) }}" class="c-button c-button--sm c-button--outline">Manage Allowed Scopes</a></td>
                 <td><a href="{{ reverse_url('client_edit', client.id) }}" class="c-button c-button--sm c-button--outline">Edit</a></td>
                 <td>
                   <form action="{{ reverse_url('client_deletion', client.id) }}" method="post">
@@ -143,11 +145,15 @@
             <tbody>
               {% for scope in api.scopes %}
                 <tr>
+                {% if current_user.is_admin %}
                 <td>
                   <a href="{{ reverse_url('scope_edit', api.id, scope.id) }}">
                     {{ scope.name }}
                   </a>
                 </td>
+                {% else %}
+                <td>{{ scope.name }}</td>
+                {% end %}
                 <td>{{ scope.description }}</td>
                 <td>{{ scope.created_at }}</td>
                 <td>{{ scope.updated_at }}</td>

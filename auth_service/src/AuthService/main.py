@@ -11,7 +11,8 @@ from auth.handlers.api import (
     ApiAddition, ApiList, ApiDeletion, ApiEdit, ApiDetail
 )
 from auth.handlers.client import (
-    ClientAddition, ClientList, ClientDeletion, ClientEdit, ClientDetail
+    ClientAddition, ClientList, ClientDeletion, ClientEdit, ClientDetail,
+    ClientApiScopesEdit
 )
 from auth.handlers.user import UserDetail, UserList
 
@@ -94,6 +95,13 @@ def make_app():
             {"db": db},
             name="client_detail"
         ),
+        url(
+            r"/clients/(?P<pk>[0-9]+)/apis/(?P<api_pk>[0-9]+)/scopes/",
+            ClientApiScopesEdit,
+            {"db": db},
+            name="clientapi_scopes_edit"
+        ),
+
         # endregion
         # region Authentication handlers
         url(
