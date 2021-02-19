@@ -20,6 +20,6 @@ class RequestsHelper:
             (dict): Decoded body arguments dictionary.
         """
         return {
-            key: [value[0].decode("UTF-8")]
+            key: [list_item.decode("UTF-8") for list_item in value]
             for key, value in request.body_arguments.items()
         }

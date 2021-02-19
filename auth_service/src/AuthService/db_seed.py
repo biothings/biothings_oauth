@@ -2,7 +2,7 @@ import uuid
 import secrets
 
 from auth.models import (
-    Client, ClientType, Api, Scope, User, ClientApi, ClientApiScope
+    Client, ClientType, Api, Scope, User, ClientApi, ClientApiScope, UserRole
 )
 from AuthService.database import Session
 
@@ -12,10 +12,26 @@ DB = Session()
 
 def create_users():
     users = [
-        User(identity_provider="Github", username="Github-user"),
-        User(identity_provider="Google", username="Google-user"),
-        User(identity_provider="Facebook", username="Facebook-user"),
-        User(identity_provider="Twitter", username="Twitter-user"),
+        User(
+            role=UserRole.ADMIN,
+            identity_provider="GITHUB",
+            username="Github-Admin-user"
+        ),
+        User(
+            role=UserRole.ADMIN,
+            identity_provider="ORCID",
+            username="ORCID-Admin-user"
+        ),
+        User(
+            role=UserRole.REGULAR_USER,
+            identity_provider="ORCID",
+            username="ORCID-user"
+        ),
+        User(
+            role=UserRole.REGULAR_USER,
+            identity_provider="GITHUB",
+            username="GITHUB-user"
+        ),
     ]
 
     for user in users:
@@ -42,7 +58,7 @@ def create_clients(users=None):
         client = Client(name=client_names[i], type=client_types[i])
         client.client_id = uuid.uuid4()
         client.client_secret = secrets.token_urlsafe()[:25]
-        client.user = users[i]
+        client.user = users[i % 2]
 
         clients.append(client)
         DB.add(client)

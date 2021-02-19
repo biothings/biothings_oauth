@@ -17,6 +17,8 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy
+      memcached:
+        condition: service_started
     restart: on-failure
 
   postgres_db:
@@ -32,6 +34,11 @@ services:
       timeout: 10s
       interval: 1s
       retries: 20
+
+  memcached:
+    image: bitnami/memcached:1.6.9
+    env_file:
+      - .env
 
 volumes:
   postgres_data:

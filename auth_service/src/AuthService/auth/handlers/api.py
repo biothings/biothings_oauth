@@ -1,12 +1,13 @@
-import datetime
-
 from sqlalchemy import exists, and_
+from sqlalchemy.orm import subqueryload
 from tornado.web import RequestHandler
+import tornado
 
 from auth import APP_NAME
-from auth.models import Api
+from auth.models import Api, ClientApi, Client
 from auth.forms import ApiForm
 from bases.handlers import BaseHandler
+from helpers.decorators import admin_required
 from helpers.handlers import HandlersHelper
 
 
@@ -16,6 +17,7 @@ class ApiAddition(BaseHandler, RequestHandler):
     record.
     """
 
+    @admin_required
     def get(self):
         """
         Handles rendering API addition form.
@@ -26,6 +28,7 @@ class ApiAddition(BaseHandler, RequestHandler):
             form=ApiForm()
         )
 
+    @admin_required
     def post(self):
         """
         Handles saving a new instance to Api model.
@@ -72,19 +75,77 @@ class ApiList(BaseHandler, RequestHandler):
     Handles listing/deleting/and redirecting to editing API instances.
     """
 
+    @tornado.web.authenticated
     def get(self):
         """
         Handles listing all existing API instances ascending sorted by
         'created_at' field.
         """
+        apis = list(
+            self.db
+                .query(Api)
+                .order_by(Api.created_at)
+        )
 
         self.render(
             f"{APP_NAME}/api/api_list.html",
-            apis=list(
+            apis=apis
+        )
+
+
+class ApiDetail(BaseHandler, RequestHandler):
+    """
+    Handles displaying an API instance's details.
+    """
+
+    @tornado.web.authenticated
+    def get(self, pk):
+        """
+        Handles rendering an API instance's details web page.
+
+        Arguments:
+            pk (int): Primary key (ID) of the API instance.
+        """
+
+        if self.current_user.is_admin:
+            api = self.db \
+                .query(Api) \
+                .options(
+                    subqueryload(Api.clients, ClientApi.client),
+                    subqueryload(Api.scopes)
+                ) \
+                .filter(Api.id == pk) \
+                .first()
+        else:
+            api = self.db \
+                .query(Api) \
+                .options(
+                    subqueryload(Api.scopes)
+                ) \
+                .filter(Api.id == pk) \
+                .first()
+
+        if not api:
+            self.set_status(404)
+            return
+
+        # Return the appropriate clients based on user's role.
+        if not self.current_user.is_admin:
+            clients = list(
                 self.db
-                    .query(Api)
-                    .order_by(Api.created_at)
+                .query(Client)
+                .filter(Client.user_id == self.current_user.id)
+                .join(ClientApi)
+                .filter(ClientApi.api_id == api.id)
             )
+        else:
+            clients = [client_api.client for client_api in api.clients]
+
+        self.render(
+            f"{APP_NAME}/api/api_detail.html",
+            api=api,
+            clients=clients,
+            result=None
         )
 
 
@@ -93,6 +154,7 @@ class ApiDeletion(BaseHandler, RequestHandler):
     Handles deleting an API instance.
     """
 
+    @admin_required
     def post(self, pk):
         """
         Delete an API instance using its pk.
@@ -120,6 +182,7 @@ class ApiEdit(BaseHandler, RequestHandler):
     Handles editing an API instance.
     """
 
+    @admin_required
     def get(self, pk):
         """
         Handles rendering API editing form.
@@ -143,6 +206,7 @@ class ApiEdit(BaseHandler, RequestHandler):
             form=ApiForm(obj=api)
         )
 
+    @admin_required
     def post(self, pk):
         """
         Edits an existing API instance.

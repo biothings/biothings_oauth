@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Wu Lab | Add Client</title>
+  <title>The Wu Lab | User Detail</title>
 
   <!-- GOOGLE FONT LATO -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -14,22 +14,11 @@
 
 <body>
   <div class="l-wrapper">
-    <section class="u-py-48 u-bg-gray l-viewport-center">
+    <section class="u-py-48 u-bg-gray">
       <div class="l-container u-text-center">
-
-        <div class="u-mb-32">
-          <h1 class="u-text-uppercase">Add Client</h1>
-          <p>or go back to <a href="{{ reverse_url('client_list') }}">Clients list</a></p>
-        </div>
-
-        <div>
-          {%
-            module Template(
-              "auth/form.html", result=result, form=form, action="Add Client"
-            )
-          %}          
-        </div>
-
+          <h1>{{ user.username }} details:</h1>
+          <h2>Authenticated with: {{ user.identity_provider.value }}</h2>
+          <h2>Last time signed in with {{ user.identity_provider.value }}: {{ user.last_identity_provider_authentication }} UTC</h2>
       </div><!-- /.l-container -->
     </section>
   </div>
