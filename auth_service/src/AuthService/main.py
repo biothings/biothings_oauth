@@ -111,6 +111,12 @@ def make_app():
             name="github_auth"
         ),
         url(
+            r"/oauth/orcid_auth",
+            auth_views.OrcidAuth,
+            {"db": db},
+            name="orcid_auth"
+        ),
+        url(
             r"/oauth/token",
             auth_views.OAuthTokenIssuing,
             {"db": db},

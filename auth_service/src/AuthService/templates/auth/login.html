@@ -33,6 +33,16 @@
           {% module xsrf_form_html() %}
         </form>
 
+        <form action="{{ reverse_url("orcid_auth") }}" method="post" class="c-form">
+
+          <div class="u-mt-32">
+            <button type="submit" style="cursor: pointer;">
+              <img src="{{ static_url("images/sign_in_with_orcid.png") }}">
+            </button>
+          </div>
+          {% module xsrf_form_html() %}
+        </form>
+
       </div><!-- /.l-container -->
     </section>
   </div>

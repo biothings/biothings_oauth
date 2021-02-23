@@ -44,14 +44,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
+    full_name = Column(String(255))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     role = Column(
         Enum(UserRole), default=UserRole.REGULAR_USER, nullable=False
     )
-    username = Column(String(64), nullable=False)
-    identity_provider = Column(Enum(UserIdentityProvider))
-    identity_provider_user_id = Column(Integer)
-    last_identity_provider_authentication = Column(DateTime)
+    username = Column(String(255), nullable=False)
+    identity_provider = Column(Enum(UserIdentityProvider), nullable=False)
+    identity_provider_user_id = Column(String(255), nullable=False)
+    last_login = Column(DateTime, nullable=False)
 
     clients = relationship("Client", back_populates="user")
 

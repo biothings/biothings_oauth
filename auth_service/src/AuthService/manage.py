@@ -2,18 +2,23 @@ import sys
 
 from alembic.config import Config
 from alembic import command
-from AuthService import database, settings
+from AuthService import settings
 
 
-def drop_all():
+def drop_all(alembic_conf=None):
     """
     Drops all tables in the database.
+
+    @:param alembic_conf: Alembic configuration to be used.
     """
+
+    if alembic_conf is None:
+        alembic_conf = initialize_alembic_conf()
 
     print("Dropping all tables in 'auth.models'..")
 
     from auth import models
-    database.Base.metadata.drop_all(bind=database.engine)
+    command.downgrade(alembic_conf, "base")
 
     print("SUCCESS")
 
@@ -36,12 +41,11 @@ def flush_db():
     """
 
     conf = initialize_alembic_conf()
-    drop_all()
+
+    drop_all(conf)
 
     print("Upgrading migrations to head..")
-
     command.upgrade(conf, "head")
-
     print("SUCCESS")
 
 

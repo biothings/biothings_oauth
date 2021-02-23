@@ -1,5 +1,6 @@
 import uuid
 import secrets
+from datetime import datetime
 
 from auth.models import (
     Client, ClientType, Api, Scope, User, ClientApi, ClientApiScope, UserRole
@@ -15,22 +16,30 @@ def create_users():
         User(
             role=UserRole.ADMIN,
             identity_provider="GITHUB",
-            username="Github-Admin-user"
+            identity_provider_user_id="github_admin_user",
+            username="Github-Admin-user",
+            last_login=datetime.utcnow()
         ),
         User(
             role=UserRole.ADMIN,
             identity_provider="ORCID",
-            username="ORCID-Admin-user"
+            identity_provider_user_id="orcid_admin_user",
+            username="ORCID-Admin-user",
+            last_login=datetime.utcnow()
         ),
         User(
             role=UserRole.REGULAR_USER,
             identity_provider="ORCID",
-            username="ORCID-user"
+            identity_provider_user_id="orcid_user",
+            username="ORCID-user",
+            last_login=datetime.utcnow()
         ),
         User(
             role=UserRole.REGULAR_USER,
             identity_provider="GITHUB",
-            username="GITHUB-user"
+            identity_provider_user_id="github_user",
+            username="GITHUB-user",
+            last_login=datetime.utcnow()
         ),
     ]
 
