@@ -27,7 +27,25 @@ class ApiForm(Form):
     )
 
 
-class ClientForm(Form):
+class BaseClientForm(Form):
+    """
+    Base Client model form fields.
+    """
+
+    name = StringField(
+        'Name',
+        [validators.Length(max=256), validators.DataRequired()],
+        render_kw={"maxlength": 256}
+    )
+    type = SelectField(
+        "Type",
+        [validators.DataRequired()],
+        choices=[(choice.name, choice.value) for choice in ClientType]
+    )
+    authorized = BooleanField(default=True)
+
+
+class ClientForm(BaseClientForm):
     """
     Client model form.
     """
@@ -66,24 +84,18 @@ class ClientForm(Form):
                 [client_api.api_id for client_api in kwargs["obj"].apis]
             )
 
-    name = StringField(
-        'Name',
-        [validators.Length(max=256), validators.DataRequired()],
-        render_kw={"maxlength": 256}
-    )
-    type = SelectField(
-        "Type",
-        [validators.DataRequired()],
-        choices=[(choice.name, choice.value) for choice in ClientType]
-    )
     apis = SelectMultipleField(
         "APIs",
         choices=[],  # This is dynamically set in form's creation.
         coerce=int
     )
-    authorized = BooleanField(default=True)
 
-    # user = todo
+
+class ApiClientForm(BaseClientForm):
+    """
+    Client model form for a specific API.
+    """
+    pass
 
 
 class ScopeForm(Form):

@@ -4,7 +4,7 @@ from tornado.web import RequestHandler
 from bases.handlers import BaseHandler
 from helpers.decorators import admin_required
 from auth import APP_NAME
-from auth.models import User
+from auth.models import User, Client
 
 
 class UserDetail(BaseHandler, RequestHandler):
@@ -34,7 +34,15 @@ class UserDetail(BaseHandler, RequestHandler):
             self.set_status(403)
             return
 
-        self.render(f"{APP_NAME}/user/user_detail.html", user=user)
+        clients = list(
+            self.db
+            .query(Client)
+            .filter(Client.user_id == user.id)
+        )
+
+        self.render(
+            f"{APP_NAME}/user/user_detail.html", user=user, clients=clients
+        )
 
 
 class UserList(BaseHandler, RequestHandler):

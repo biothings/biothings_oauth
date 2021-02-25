@@ -83,7 +83,13 @@
                 </td>
                 <td>{{ client.client_id }}</td>
                 {% if current_user.id == client.user_id %}
-                <td>{{ client.client_secret }}</td>
+                <td>
+                  <a href="javascript: void(0);"
+                     onclick="this.innerHTML = '{{ client.raw_client_secret }}';
+                              this.style = 'pointer-events: none; color: #3b3b3b;';">
+                    Show
+                  </a>
+                </td>
                 {% else %}
                 <td style="font-style: italic;">hidden</td>
                 {% end %}
@@ -107,8 +113,9 @@
         <p class="c-lead">No clients were linked. Please link some clients first!</p>
         {% end %}
 
-        <p>TODO: Add specific API client</p>
-        <a href="{{ reverse_url('client_addition') }}" class="c-button c-button--lg">Add new client</a>
+        <a href="{{ reverse_url('api_client_addition', api.id) }}" class="c-button c-button--lg">
+          Add new client
+        </a>
 
         <hr>
 

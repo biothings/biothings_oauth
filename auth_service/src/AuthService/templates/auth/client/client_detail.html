@@ -8,6 +8,14 @@
         <div class="c-table-responsive u-mb-48">
           <table class="c-dictionary-table">
             <tbody>
+              {% if current_user.is_admin %}
+              <tr>
+                <th>User:</th>
+                <td>
+                  <a href="{{ reverse_url('user_detail', client.user.id) }}">{{ client.user }}</a>
+                </td>
+              </tr>
+              {% end %}
               <tr>
                 <th>Client Name:</th>
                 <td>{{ client.name }}</td>
@@ -32,7 +40,17 @@
               </tr>
               <tr>
                 <th>Client Secret:</th>
-                <td>{{ client.client_secret }}</td>
+                {% if current_user.id == client.user_id %}
+                <td>
+                  <a href="javascript: void(0);"
+                     onclick="this.innerHTML = '{{ client.raw_client_secret }}';
+                              this.style = 'pointer-events: none; color: #3b3b3b;';">
+                    Show
+                  </a>
+                </td>
+                {% else %}
+                <td style="font-style: italic;">hidden</td>
+                {% end %}
               </tr>
               <tr>
                 <th>Client CreatedAt:</th>

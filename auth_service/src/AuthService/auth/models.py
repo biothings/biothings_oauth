@@ -10,6 +10,7 @@ from sqlalchemy import (
 )
 
 from AuthService.database import Base
+from helpers.encryption_helper import EncryptionHelper
 
 
 class BaseModel:
@@ -152,6 +153,16 @@ class Client(Base, BaseModel):
     apis = relationship(
         "ClientApi", back_populates="client", cascade="all,delete-orphan"
     )
+
+    @property
+    def raw_client_secret(self):
+        """
+        Returns decrypted client_secret value.
+
+        :return: Decrypted client_secret value as string.
+        """
+
+        return EncryptionHelper.decrypt_str(self.client_secret)
 
     def __str__(self):
         return self.name

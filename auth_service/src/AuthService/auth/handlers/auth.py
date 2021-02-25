@@ -4,6 +4,7 @@ import datetime
 import os
 import requests
 
+import tornado
 from requests_oauthlib import OAuth2Session
 from sqlalchemy.orm import subqueryload
 from sqlalchemy.sql.expression import true
@@ -18,7 +19,6 @@ from bases.handlers import BaseHandler, XsrfExemptedHandler
 from auth.models import (
     Client, ClientApi, Scope, User, UserIdentityProvider, ClientApiScope
 )
-from core import APP_NAME as CORE_APP_NAME
 from auth import APP_NAME
 
 
@@ -56,7 +56,7 @@ class OAuthTokenIssuing(XsrfExemptedHandler, BaseHandler, RequestHandler):
             .filter(Client.client_id == client_id)\
             .first()
 
-        return None if not client else client.client_secret
+        return None if not client else client.raw_client_secret
 
     def _get_client_authorized_scopes(self, client_id):
         authorized_client_api_ids = self.db\
@@ -194,11 +194,9 @@ class GitHubAuth(BaseAuth):
 
         auth_url, state = github.authorization_url(auth_base_url)
         state_md5_hash = hashlib.md5(state.encode('UTF-8')).hexdigest()
-
         memcached_client = get_memcached_client()
-        memcached_client.set(
-            key=state_md5_hash, value=state_md5_hash, time=10 * 60
-        )
+
+        memcached_client.set(key=state_md5_hash, value=True, time=10 * 60)
 
         self.redirect(auth_url)
 
@@ -210,6 +208,8 @@ class GitHubAuth(BaseAuth):
         memcached_client = get_memcached_client()
 
         if memcached_client.get(state_md5_hash):
+            memcached_client.delete(state_md5_hash)
+
             github = OAuth2Session(self.__client_id)
             try:
                 github.fetch_token(
@@ -219,7 +219,7 @@ class GitHubAuth(BaseAuth):
                 )
             except Exception:
                 self.render(
-                    f"{CORE_APP_NAME}/home.html",
+                    f"{APP_NAME}/login.html",
                     auth_error="Failed to sign in. Please try again!"
                 )
                 return
@@ -228,7 +228,7 @@ class GitHubAuth(BaseAuth):
 
             if github_user_response.status_code != requests.codes.OK:
                 self.render(
-                    f"{CORE_APP_NAME}/home.html",
+                    f"{APP_NAME}/login.html",
                     auth_error="Failed to sign in. Please try again!"
                 )
                 return
@@ -246,7 +246,7 @@ class GitHubAuth(BaseAuth):
                 self.redirect(self.reverse_url("user_detail", user.id))
         else:
             self.render(
-                f"{CORE_APP_NAME}/home.html",
+                f"{APP_NAME}/login.html",
                 auth_error="Bad/Not Allowed sign in attempt. Please try again!"
             )
 
@@ -293,7 +293,7 @@ class OrcidAuth(BaseAuth):
             token = response.json()
         except Exception as e:
             self.render(
-                    f"{CORE_APP_NAME}/home.html",
+                    f"{APP_NAME}/login.html",
                     auth_error="Failed to sign in. Please try again!"
                 )
             return
@@ -302,7 +302,7 @@ class OrcidAuth(BaseAuth):
                 "access_token" not in token or \
                 "expires_in" not in token:
             self.render(
-                f"{CORE_APP_NAME}/home.html",
+                f"{APP_NAME}/login.html",
                 auth_error="Failed to sign in. Please try again!"
             )
             return
@@ -328,4 +328,23 @@ class Login(BaseHandler, RequestHandler):
         """
         Handles rendering user login options.
         """
-        self.render(f"{APP_NAME}/login.html")
+
+        if self.current_user:
+            self.redirect(self.reverse_url("home"))
+
+        self.render(f"{APP_NAME}/login.html", auth_error=None)
+
+
+class Logout(BaseHandler, RequestHandler):
+    """
+    Handles user's logout.
+    """
+
+    @tornado.web.authenticated
+    def post(self):
+        """
+        Handles logging a user out and redirecting to home page.
+        """
+        self.clear_cookie("_pk")
+
+        self.redirect(self.reverse_url("home"))

@@ -10,6 +10,10 @@
           <h2 style="color: red; font-style: italic;">You must login first!</h2>
         {% end %}
 
+        {% if auth_error %}
+          <h2 style="color: red; font-style: italic;">{{ auth_error }}</h2>
+        {% end %}
+
         <form action="{{ reverse_url("github_auth") }}" method="post" class="c-form">
 
           <div class="u-mt-32">

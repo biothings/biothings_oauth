@@ -5,10 +5,11 @@ import tornado
 
 from auth import APP_NAME
 from auth.models import Api, ClientApi, Client
-from auth.forms import ApiForm
+from auth.forms import ApiForm, ApiClientForm
 from bases.handlers import BaseHandler
 from helpers.decorators import admin_required
 from helpers.handlers import HandlersHelper
+from helpers.models_helpers.client_helper import ClientHelper
 
 
 class ApiAddition(BaseHandler, RequestHandler):
@@ -257,3 +258,73 @@ class ApiEdit(BaseHandler, RequestHandler):
         self.db.commit()
 
         self.redirect(self.reverse_url("api_list"))
+
+
+class ApiClientAddition(BaseHandler, RequestHandler):
+    """
+    Handles adding a new Client instance to an Api instance.
+    """
+
+    @tornado.web.authenticated
+    def get(self, pk):
+        """
+        Handles rendering API Client addition form.
+
+        Arguments:
+            pk (int): Primary key (ID) of the API instance to add a Client to.
+        """
+
+        api = self.db\
+            .query(Api)\
+            .filter(Api.id == pk)\
+            .first()
+
+        if not api:
+            self.set_status(404)
+            return
+
+        self.render(
+            f"{APP_NAME}/api/api_client_addition.html",
+            form=ApiClientForm(),
+            api=api
+        )
+
+    @tornado.web.authenticated
+    def post(self, pk):
+        """
+        Adds a new Client to an existing API instance.
+
+        Arguments:
+            pk (int): Primary key (ID) of the API instance to add a Client to.
+        """
+        api = self.db \
+            .query(Api) \
+            .filter(Api.id == pk) \
+            .first()
+
+        if not api:
+            self.set_status(404)
+            return
+
+        form = HandlersHelper.build_request_form(self.request, ApiClientForm)
+
+        if not form.validate():
+            self.set_status(400)
+            self.render(
+                f"{APP_NAME}/api/api_client_addition.html",
+                result="Could not save Client instance! "
+                       "Please fix the described errors first.",
+                form=form
+            )
+            return
+
+        client = Client(user_id=self.current_user.id)
+
+        form.populate_obj(client)
+        ClientHelper.set_client_credentials(client)
+
+        self.db.add(client)
+        self.db.add(ClientApi(client=client, api=api))
+        self.db.commit()
+
+        self.redirect(self.reverse_url("api_detail", api.id))

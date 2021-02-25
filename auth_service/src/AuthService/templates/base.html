@@ -37,6 +37,9 @@
             <li class="c-navbar-close c-button js-navbar-close"><span>Close Menu</span><span>&times;</span></li>
             {% if current_user %}
               <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("user_detail", current_user.id) }}" class="c-navbar__nav-link">My Profile</a>
+              </li>
+              <li class="c-navbar__nav-item">
                 <a href="{{ reverse_url("api_list") }}" class="c-navbar__nav-link">APIs</a>
                 {% if current_user.is_admin %}
                 <ul class="c-navbar__nav-dropdown">
@@ -70,10 +73,14 @@
               </li>
               {% end %}
 
-              <li class="c-navbar__nav-item">
-                <!-- TODO -->
-                <a href="#" class="c-navbar__nav-link">Logout</a>
-              </li>
+              <form action="{{ reverse_url('logout')}}" method="post">
+                <li class="c-navbar__nav-item">
+                  <a href="javascript:void(0);" class="c-navbar__nav-link" onclick="this.parentElement.parentElement.submit();">
+                    Logout ({{ current_user }})
+                  </a>
+                  {% module xsrf_form_html() %}
+                </li>
+              </form>
             {% else %}
               <li class="c-navbar__nav-item">
                 <a href="{{ reverse_url("login") }}" class="c-navbar__nav-link">Login</a>
