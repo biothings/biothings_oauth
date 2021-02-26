@@ -18,7 +18,8 @@
       <div class="l-container u-text-center">
           <h1>{{ user.username }} details:</h1>
           <h2>Authenticated with: {{ user.identity_provider.value }}</h2>
-          <h2>Last time signed in with {{ user.identity_provider.value }}: {{ user.last_identity_provider_authentication }} UTC</h2>
+          <h2>Name: {{ user.full_name }}</h2>
+          <h2>Last time signed in with {{ user.identity_provider.value }}: {{ user.last_login }} UTC</h2>
       </div><!-- /.l-container -->
     </section>
   </div>
