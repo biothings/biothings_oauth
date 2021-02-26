@@ -1,19 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Wu Lab Auth Service | Login</title>
-
-  <!-- GOOGLE FONT LATO -->
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
-
-</head>
-
-<body>
-  <div class="l-wrapper">
+{% extends "../base.html" %}
+{% block title %} | Login{% end %}
+{% block body %}
     <section class="u-py-48 u-bg-gray">
       <div class="l-container u-text-center">
 
@@ -21,6 +8,10 @@
 
         {% if request.query_arguments.get("next") %}
           <h2 style="color: red; font-style: italic;">You must login first!</h2>
+        {% end %}
+
+        {% if auth_error %}
+          <h2 style="color: red; font-style: italic;">{{ auth_error }}</h2>
         {% end %}
 
         <form action="{{ reverse_url("github_auth") }}" method="post" class="c-form">
@@ -45,7 +36,4 @@
 
       </div><!-- /.l-container -->
     </section>
-  </div>
-</body>
-
-</html>
+{% end %}

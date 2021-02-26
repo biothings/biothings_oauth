@@ -1,6 +1,3 @@
-import uuid
-import secrets
-
 from sqlalchemy.orm import subqueryload
 import tornado
 from tornado.web import RequestHandler
@@ -9,6 +6,7 @@ from auth import APP_NAME
 from auth.models import Client, ClientApi, ClientApiScope, Api
 from auth.forms import ClientForm
 from helpers.handlers import HandlersHelper
+from helpers.models_helpers.client_helper import ClientHelper
 from bases.handlers import BaseHandler
 
 
@@ -62,9 +60,9 @@ class ClientAddition(BaseHandler, RequestHandler):
             return
 
         client = Client(user_id=self.current_user.id)
+
         form.populate_obj(client)
-        client.client_id = uuid.uuid4()
-        client.client_secret = secrets.token_urlsafe()[:25]
+        ClientHelper.set_client_credentials(client)
 
         self.db.add(client)
         self.db.commit()
@@ -122,6 +120,7 @@ class ClientDetail(BaseHandler, RequestHandler):
             .query(Client) \
             .options(
                 subqueryload(Client.apis, ClientApi.api),
+                subqueryload(Client.user),
             ) \
             .filter(Client.id == pk) \
             .first()

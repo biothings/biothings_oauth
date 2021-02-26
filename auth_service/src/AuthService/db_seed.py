@@ -1,11 +1,10 @@
-import uuid
-import secrets
 from datetime import datetime
 
 from auth.models import (
     Client, ClientType, Api, Scope, User, ClientApi, ClientApiScope, UserRole
 )
 from AuthService.database import Session
+from helpers.models_helpers.client_helper import ClientHelper
 
 
 DB = Session()
@@ -65,9 +64,9 @@ def create_clients(users=None):
 
     for i in range(4):
         client = Client(name=client_names[i], type=client_types[i])
-        client.client_id = uuid.uuid4()
-        client.client_secret = secrets.token_urlsafe()[:25]
         client.user = users[i % 2]
+
+        ClientHelper.set_client_credentials(client)
 
         clients.append(client)
         DB.add(client)

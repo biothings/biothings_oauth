@@ -108,7 +108,7 @@ h4 {
 }
 
 .l-viewport-center {
-  min-height: 100vh;
+  min-height: calc(100vh - 82px);
   display: flex;
   align-items: center;  
 }
@@ -188,6 +188,120 @@ h4 {
 .c-button a:hover,
 .c-button a:focus {
   text-decoration: none;
+}
+
+/*=========================================
+| NAVBAR CSS
+=========================================*/
+
+.c-navbar {
+  background-color: #fafafa;
+  padding: 16px;
+}
+
+.c-navbar__logo a {
+  color: #3b3b3b;
+  font-size: 20px;
+  line-height: 20px;
+  display: block;
+  text-decoration: none;
+}
+
+.c-navbar__content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.c-navbar__nav,
+.c-navbar__nav-dropdown {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-navbar__nav-item {
+  margin: 0 24px;
+  position: relative;
+}
+
+.c-navbar__nav-item a {
+  color: #3b3b3b;
+  font-size: 16px;
+  transition: .2s;
+  text-decoration: none;
+  /* font-weight: 300; */
+  font-weight: 400;
+}
+
+.c-navbar__nav-link {
+  display: block;
+  padding: 12px 0;
+}
+
+.c-navbar__nav-dropdown-link {
+  padding: 8px 16px;
+  display: block;
+}
+
+.c-navbar__nav-dropdown {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1.2px 12px 0 rgb(0 0 0 / 13%);
+  min-width: 160px;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transform-origin: top;
+  transition: .2s;
+}
+
+.c-navbar__nav-item:hover .c-navbar__nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.c-navbar__nav-dropdown li:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.c-navbar-trigger,
+.c-navbar-close {
+  min-width: auto;
+  border-radius: 4px;
+  display: flex;
+  gap: 5px;
+}
+
+.c-navbar-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+}
+
+.c-body-overlay {
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, .75);
+  transition: .4s;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.c-body-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 /*=========================================
@@ -390,6 +504,66 @@ tbody tr:nth-child(even) {
 | MEDIA QUERY
 =========================================*/
 
+@media (max-width: 767px) {
+  .c-navbar__nav {
+    position: fixed;
+    width: 260px;
+    height: 100vh;
+    right: 0;
+    top: 0;
+    background-color: var(--accent-color-1);
+    overflow-y: auto;
+    padding: 72px 0 40px;
+    transform: translateX(100%);
+    transition: .4s;
+    z-index: 1;
+  }
+
+  .c-navbar__nav.is-open {
+    transform: translateX(0);
+  }
+  
+  .c-navbar__nav-item a,
+  .c-navbar__nav-item:hover > a,
+  .c-navbar__nav-item:focus > a,
+  .c-navbar__nav-dropdown-link:hover,
+  .c-navbar__nav-dropdown-link:focus {
+    color: #fff;
+  }
+
+  .c-navbar__nav-dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+    padding: 0;
+  }
+
+  .c-navbar__nav-dropdown li:not(:last-child) {
+    border: 0;
+  }
+
+  .c-navbar__nav-item:not(:last-child) > a,
+  .c-navbar__nav-dropdown li > a {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .c-navbar__nav-item a {
+    font-size: 14px;
+  }
+  
+  .c-navbar__nav-dropdown li > a {
+    color: rgba(255, 255, 255, .75);
+    padding: 12px 16px;
+  }
+
+  .c-navbar__nav-dropdown li > a:hover {
+    color: #fff;
+  }
+}
+
 @media (min-width: 360px) {
   .c-form {
     padding: 3.2rem;
@@ -410,6 +584,22 @@ tbody tr:nth-child(even) {
   h1 {
     font-size: 4.7rem;
   }
+  .c-navbar__nav {
+    display: flex;
+  }
+  .c-navbar-trigger,
+  .c-navbar-close {
+    display: none;
+  }
+  .c-navbar {
+    padding-left: 40px;
+  }
+  .c-navbar__nav-item:hover > a,
+  .c-navbar__nav-item:focus > a,
+  .c-navbar__nav-dropdown-link:hover,
+  .c-navbar__nav-dropdown-link:focus {
+    color: var(--accent-color-1);
+  }  
 }
 
 @media (min-width: 1024px) {

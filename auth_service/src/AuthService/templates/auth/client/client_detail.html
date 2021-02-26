@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Wu Lab | Client Details</title>
-
-  <!-- GOOGLE FONT LATO -->
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
-
-</head>
-
-<body>
-
-  <div class="l-wrapper">
+{% extends "../../base.html" %}
+{% block title %} | Client Details{% end %}
+{% block body %}
     <section class="u-py-48 u-bg-light-gray l-viewport-center">
       <div class="l-container u-text-center">
 
@@ -22,6 +8,14 @@
         <div class="c-table-responsive u-mb-48">
           <table class="c-dictionary-table">
             <tbody>
+              {% if current_user.is_admin %}
+              <tr>
+                <th>User:</th>
+                <td>
+                  <a href="{{ reverse_url('user_detail', client.user.id) }}">{{ client.user }}</a>
+                </td>
+              </tr>
+              {% end %}
               <tr>
                 <th>Client Name:</th>
                 <td>{{ client.name }}</td>
@@ -46,7 +40,17 @@
               </tr>
               <tr>
                 <th>Client Secret:</th>
-                <td>{{ client.client_secret }}</td>
+                {% if current_user.id == client.user_id %}
+                <td>
+                  <a href="javascript: void(0);"
+                     onclick="this.innerHTML = '{{ client.raw_client_secret }}';
+                              this.style = 'pointer-events: none; color: #3b3b3b;';">
+                    Show
+                  </a>
+                </td>
+                {% else %}
+                <td style="font-style: italic;">hidden</td>
+                {% end %}
               </tr>
               <tr>
                 <th>Client CreatedAt:</th>
@@ -129,8 +133,4 @@
 
       </div><!-- /.l-container -->
     </section>
-  </div>
-
-</body>
-
-</html>
+{% end %}

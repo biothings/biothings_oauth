@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wu Lab Auth Service{% block title %}{% end %}</title>
+
+  <!-- GOOGLE FONT LATO -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+</head>
+
+<body>
+
+  <!-- Body Overlay -->
+  <div class="c-body-overlay js-body-overlay"></div>
+
+  <div class="l-wrapper">
+
+    <!-- Navbar -->
+    <nav class="c-navbar">
+      <div class="l-container-fluid">
+        <div class="c-navbar__content">
+
+          <div class="c-navbar__logo">
+            <a href="{{ reverse_url("home") }}">
+              <!-- TODO: Add logo here if needed -->
+              <strong>The Wu Lab Auth Service</strong>
+            </a>
+          </div>
+
+          <button class="c-navbar-trigger c-button js-navbar-trigger"><span>Menu</span><span>&#9776;</span></button>
+
+          <ul class="c-navbar__nav js-navbar-nav">
+            <li class="c-navbar-close c-button js-navbar-close"><span>Close Menu</span><span>&times;</span></li>
+            {% if current_user %}
+              <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("user_detail", current_user.id) }}" class="c-navbar__nav-link">My Profile</a>
+              </li>
+              <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("api_list") }}" class="c-navbar__nav-link">APIs</a>
+                {% if current_user.is_admin %}
+                <ul class="c-navbar__nav-dropdown">
+                  <li>
+                    {% if current_user.is_admin %}
+                    <a href="{{ reverse_url("api_addition") }}"  class="c-navbar__nav-dropdown-link">Add API</a>
+                    {% end %}                   
+                  </li>
+                </ul>
+                {% end %}              
+              </li>
+
+              <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("client_list") }}" class="c-navbar__nav-link">
+                  {% if current_user.is_admin %}
+                  Clients
+                  {% else %}
+                  My Clients
+                  {% end %}
+                </a>
+                <ul class="c-navbar__nav-dropdown">
+                  <li>
+                    <a href="{{ reverse_url("client_addition") }}"  class="c-navbar__nav-dropdown-link">Add Client</a>
+                  </li>
+                </ul>
+              </li>
+
+              {% if current_user.is_admin %}
+              <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("user_list") }}" class="c-navbar__nav-link">Users</a>
+              </li>
+              {% end %}
+
+              <form action="{{ reverse_url('logout')}}" method="post">
+                <li class="c-navbar__nav-item">
+                  <a href="javascript:void(0);" class="c-navbar__nav-link" onclick="this.parentElement.parentElement.submit();">
+                    Logout ({{ current_user }})
+                  </a>
+                  {% module xsrf_form_html() %}
+                </li>
+              </form>
+            {% else %}
+              <li class="c-navbar__nav-item">
+                <a href="{{ reverse_url("login") }}" class="c-navbar__nav-link">Login</a>
+              </li>
+            {% end %}
+          </ul>
+
+        </div>
+      </div>
+    </nav>
+
+    {% block body %}
+    {% end %}
+  </div>
+
+  <!-- Main JS -->
+  <script src="{{ static_url("js/main.js") }}"></script>
+</body>
+
+</html>

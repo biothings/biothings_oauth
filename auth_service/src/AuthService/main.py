@@ -8,7 +8,7 @@ from core.handlers import Home
 from auth.handlers import auth as auth_views
 from auth.handlers.scope import ScopeAddition, ScopeDeletion, ScopeEdit
 from auth.handlers.api import (
-    ApiAddition, ApiList, ApiDeletion, ApiEdit, ApiDetail
+    ApiAddition, ApiList, ApiDeletion, ApiEdit, ApiDetail, ApiClientAddition
 )
 from auth.handlers.client import (
     ClientAddition, ClientList, ClientDeletion, ClientEdit, ClientDetail,
@@ -47,6 +47,12 @@ def make_app():
             ApiEdit,
             {"db": db},
             name="api_edit"
+        ),
+        url(
+            r"/apis/(?P<pk>[0-9]+)/clients/add",
+            ApiClientAddition,
+            {"db": db},
+            name="api_client_addition"
         ),
         # endregion
         # region Scope handlers
@@ -140,6 +146,7 @@ def make_app():
         # endregion
         # region Users
         url(settings.LOGIN_URL, auth_views.Login, {"db": db}, name="login"),
+        url("/logout", auth_views.Logout, {"db": db}, name="logout"),
         url(
             r"/users/(?P<pk>[0-9]+)",
             UserDetail,
