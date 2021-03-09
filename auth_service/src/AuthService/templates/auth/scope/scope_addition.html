@@ -1,19 +1,19 @@
 {% extends "../../base.html" %}
 {% block title %} | Add Scope{% end %}
 {% block body %}
-    <section class="u-py-48 u-bg-gray">
-      <div class="l-container u-text-center">
+  <section class="u-py-48 u-bg-gray l-viewport-center">
+    <div class="l-container u-text-center">
 
-        <h1 class="u-mb-32 u-text-uppercase">Add Scope</h1>
+      <h1 class="u-mb-32 u-text-uppercase">Add Scope</h1>
 
-        <div>
-          {%
-            module Template(
-              "auth/form.html", result=result, form=form, action="Add Scope"
-            )
-          %}
-        </div>
+      <div>
+        {%
+          module Template(
+            "auth/form.html", result=result, form=form, action="Add Scope"
+          )
+        %}
+      </div>
 
-      </div><!-- /.l-container -->
-    </section>
+    </div><!-- /.l-container -->
+  </section>
 {% end %}

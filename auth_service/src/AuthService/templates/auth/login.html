@@ -1,39 +1,67 @@
 {% extends "../base.html" %}
 {% block title %} | Login{% end %}
 {% block body %}
-    <section class="u-py-48 u-bg-gray">
-      <div class="l-container u-text-center">
+  <section class="u-py-48 u-bg-gray l-viewport-center">
+    <div class="l-container u-text-center">
 
-        <h1 class="u-mb-32 u-text-uppercase">Login to The Wu Lab Auth Service</h1>
+      <h1 class="u-mb-24">Login to The Wu Lab Auth Service</h1>
 
+      <div class="u-mb-48">
         {% if request.query_arguments.get("next") %}
           <h2 style="color: red; font-style: italic;">You must login first!</h2>
         {% end %}
 
         {% if auth_error %}
           <h2 style="color: red; font-style: italic;">{{ auth_error }}</h2>
-        {% end %}
+        {% end %}        
+      </div>
 
-        <form action="{{ reverse_url("github_auth") }}" method="post" class="c-form">
-
-          <div class="u-mt-32">
-            <button type="submit" style="cursor: pointer;">
-              <img src="{{ static_url("images/sign_in_with_github.png") }}">
-            </button>
-          </div>
+      <div class="c-login-forms">
+        <form action="{{ reverse_url("github_auth") }}" method="post">
+          <!-- <button type="submit" class="c-button c-button--big u-full-width">
+            <i class="fab fa-github u-mr-8"></i>
+            <span class="c-button__text">Sign in with GitHub</span>
+          </button> -->
+          <!-- <button type="submit" style="cursor: pointer;">
+            <img src="{{ static_url("images/sign_in_with_github.png") }}">
+          </button> -->
+          <button type="submit" class="c-button c-button--big c-button--github u-full-width">
+            <!-- <i class="fab fa-github u-mr-8"></i> -->
+            <img class="c-button__img" src="{{ static_url("images/SVG/octocat.svg") }}" alt="Octocat">
+            <span class="c-button__text">Sign in with GitHub</span>
+          </button>
           {% module xsrf_form_html() %}
         </form>
-
-        <form action="{{ reverse_url("orcid_auth") }}" method="post" class="c-form">
-
-          <div class="u-mt-32">
-            <button type="submit" style="cursor: pointer;">
-              <img src="{{ static_url("images/sign_in_with_orcid.png") }}">
-            </button>
-          </div>
+        <form action="{{ reverse_url("orcid_auth") }}" method="post">
+          <!-- <button type="submit" class="c-button c-button--big u-full-width">
+            <i class="fab fa-orcid u-mr-8"></i>
+            <span class="c-button__text">Sign in with ORCID</span>
+          </button> -->
+          <!-- <button type="submit" style="cursor: pointer;">
+            <img src="{{ static_url("images/sign_in_with_orcid.png") }}">
+          </button> -->
+          <button type="submit" class="c-button c-button--big c-button--orcid u-full-width">
+            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+              viewBox="0 0 256 256" style="enable-background:new 0 0 256 256;" xml:space="preserve">
+            <style type="text/css">
+              .st0{fill:#A6CE39;}
+              .st1{fill:#FFFFFF;}
+            </style>
+            <path class="st0" d="M256,128c0,70.7-57.3,128-128,128C57.3,256,0,198.7,0,128C0,57.3,57.3,0,128,0C198.7,0,256,57.3,256,128z"/>
+            <g>
+              <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z"/>
+              <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5
+                c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z"/>
+              <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1c0-5.6,4.5-10.1,10.1-10.1
+                C84.2,46.7,88.7,51.3,88.7,56.8z"/>
+            </g>
+            </svg>
+            <span class="c-button__text">Sign in with ORCID</span>
+          </button>          
           {% module xsrf_form_html() %}
         </form>
+      </div>
 
-      </div><!-- /.l-container -->
-    </section>
+    </div><!-- /.l-container -->
+  </section>
 {% end %}
