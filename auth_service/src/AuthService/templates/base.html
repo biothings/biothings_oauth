@@ -8,7 +8,12 @@
   <!-- GOOGLE FONT LATO -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ static_url("css/wu-labs-style.css") }}">
+
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{{ static_url("css/main.css") }}">
 
 </head>
 
@@ -31,15 +36,21 @@
             </a>
           </div>
 
-          <button class="c-navbar-trigger c-button js-navbar-trigger"><span>Menu</span><span>&#9776;</span></button>
+          <button class="c-navbar-trigger c-button js-navbar-trigger">
+            <span>Menu</span>
+            <!-- <span>&#9776;</span> -->
+            <i class="fas fa-bars"></i>
+          </button>
 
           <ul class="c-navbar__nav js-navbar-nav">
-            <li class="c-navbar-close c-button js-navbar-close"><span>Close Menu</span><span>&times;</span></li>
+            <li class="c-navbar-close js-navbar-close">
+              <i class="fas fa-times"></i>
+            </li>
             {% if current_user %}
-              <li class="c-navbar__nav-item">
+              <li class="c-navbar__nav-item {% if request.uri == reverse_url("user_detail", current_user.id) %}active{% end %}">
                 <a href="{{ reverse_url("user_detail", current_user.id) }}" class="c-navbar__nav-link">My Profile</a>
               </li>
-              <li class="c-navbar__nav-item">
+              <li class="c-navbar__nav-item {% if request.uri.startswith(reverse_url("api_list")) %}active{% end %}">
                 <a href="{{ reverse_url("api_list") }}" class="c-navbar__nav-link">APIs</a>
                 {% if current_user.is_admin %}
                 <ul class="c-navbar__nav-dropdown">
@@ -52,7 +63,7 @@
                 {% end %}              
               </li>
 
-              <li class="c-navbar__nav-item">
+              <li class="c-navbar__nav-item {% if request.uri.startswith(reverse_url("client_list")) %}active{% end %}">
                 <a href="{{ reverse_url("client_list") }}" class="c-navbar__nav-link">
                   {% if current_user.is_admin %}
                   Clients
@@ -68,21 +79,25 @@
               </li>
 
               {% if current_user.is_admin %}
-              <li class="c-navbar__nav-item">
+              <li class="c-navbar__nav-item {% if request.uri == reverse_url("user_list") %}active{% end %}">
                 <a href="{{ reverse_url("user_list") }}" class="c-navbar__nav-link">Users</a>
               </li>
               {% end %}
 
-              <form action="{{ reverse_url('logout')}}" method="post">
-                <li class="c-navbar__nav-item">
-                  <a href="javascript:void(0);" class="c-navbar__nav-link" onclick="this.parentElement.parentElement.submit();">
+              <li class="c-navbar__nav-item">
+                <form action="{{ reverse_url('logout')}}" method="post">
+                  <a 
+                    href="javascript:void(0);" 
+                    class="c-navbar__nav-link c-navbar__nav-link--logout" 
+                    onclick="this.parentElement.submit();">
                     Logout ({{ current_user }})
                   </a>
                   {% module xsrf_form_html() %}
-                </li>
-              </form>
+                </form>
+              </li>
+              
             {% else %}
-              <li class="c-navbar__nav-item">
+              <li class="c-navbar__nav-item {% if request.uri == reverse_url("login") %}active{% end %}">
                 <a href="{{ reverse_url("login") }}" class="c-navbar__nav-link">Login</a>
               </li>
             {% end %}
